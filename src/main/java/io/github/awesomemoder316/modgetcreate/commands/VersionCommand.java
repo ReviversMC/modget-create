@@ -3,7 +3,6 @@ package io.github.awesomemoder316.modgetcreate.commands;
 import com.diogonunes.jcolor.Attribute;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Properties;
 
@@ -12,7 +11,7 @@ import static com.diogonunes.jcolor.Ansi.colorize;
 public class VersionCommand implements IModgetCreateCommand {
 
     @Override
-    public void onCommand(HashMap<String, String> args) {
+    public void onCommand(List<String> args) {
         Properties versionProperties = new Properties();
 
         try {
@@ -35,7 +34,9 @@ public class VersionCommand implements IModgetCreateCommand {
     }
 
     @Override
-    public void sendHelpMessage() {
-        IModgetCreateCommand.super.sendHelpMessage();
+    public String getDescription() {
+        return "This command lists the version of Modget-Create-CE," +
+                " and the manifest version that will be created by it.\n" +
+                "There are no parameters for this command.";
     }
 }
