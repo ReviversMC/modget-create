@@ -1,11 +1,11 @@
 package io.github.awesomemoder316.modgetcreate.commands;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 public class CommandManager implements ICommandManager {
     private final List<IModgetCreateCommand> modgetCreateCommands = new ArrayList<>();
+    private int helpCommandPos;
 
     //TODO(Make this a singleton via DI software)
     public CommandManager() {
@@ -15,6 +15,7 @@ public class CommandManager implements ICommandManager {
     @Override
     public ICommandManager addCommand(IModgetCreateCommand command) {
         modgetCreateCommands.add(command);
+        if (command instanceof HelpCommand) helpCommandPos = modgetCreateCommands.size() - 1;
         return this;
     }
 
@@ -22,22 +23,25 @@ public class CommandManager implements ICommandManager {
     public void callCommand(String commandWithParams) {
         /*
         All parameters are in the format "--param value".
-        Valid example: "publish --t realToken"
-        Invalid example: "publish --t real token"
+        Valid example: "publish -t realToken"
+        Valid example: "publish --token realToken"
+        Invalid example: "publish -t real token"
          */
 
-        String command = commandWithParams.split(" --")[0];
-        HashMap<String, String> parameters = new HashMap<>();
+        String[] splitCmd = commandWithParams.split(" ");
+        String command = splitCmd[0];
+        List<String> params = new ArrayList<>();
 
-        for (String parameter: commandWithParams.split(" --")) {
-            if (command.equals(parameter)) continue;
+        for (int x = 1; x < splitCmd.length; x++) {
 
-            //Assume that the user entered the value for the param correctly.
-            parameters.put(
-                    parameter.split(" ")[0],
-                    parameter.split(" ").length > 1 ? //Stop ArrayOutOfBoundsEx.
-                    parameter.split(" ")[1] : ""
-            );
+            if (splitCmd[x].startsWith("-") || splitCmd[x].startsWith("--")) {
+                if (x + 1 < splitCmd.length &&
+                        !splitCmd[x + 1].startsWith("-") && splitCmd[x + 1].startsWith("--")) {
+                    params.add(splitCmd[x] + " " + splitCmd[x + 1]);
+                } else {
+                    params.add(splitCmd[x]);
+                }
+            }
         }
 
         for (IModgetCreateCommand modgetCreateCommand: modgetCreateCommands) {
@@ -45,31 +49,53 @@ public class CommandManager implements ICommandManager {
             for (String name: modgetCreateCommand.getCommandNames()) {
                 if (command.equalsIgnoreCase(name)) {
 
-                    //Make param check.
-                    //Check for required param, and send help message if failed.
-                    //Check for optional param, and send help message if param is invalid
-                    //Else, call the command.
+                    for (String requiredParam: modgetCreateCommand.getRequiredParameters()) {
+                        boolean found = false;
 
-                    if (!parameters.keySet().containsAll(modgetCreateCommand.getRequiredParameters())) {
-                        modgetCreateCommand.sendHelpMessage();
-                        return; //Insufficient params.
-                    }
+                        for (String param: params) {
+                            if (param.split(" ")[0].equals(requiredParam)) {
+                                found = true;
+                                break;
+                            }
+                        }
 
-                    for (String enteredParams: parameters.keySet()) {
-                        if (!enteredParams.equals("") &&
-                                !enteredParams.equals(" ") &&
-                                !modgetCreateCommand.getRequiredParameters().contains(enteredParams) &&
-                                !modgetCreateCommand.getOptionalParameters().contains(enteredParams)) {
+                        if (!found) {
                             modgetCreateCommand.sendHelpMessage();
-                            return; //Invalid params
+                            return;
                         }
                     }
 
-                    modgetCreateCommand.onCommand(parameters);
+                    for (String param: params) {
+                        boolean recognised = false;
+
+                        for (String reqParam: modgetCreateCommand.getRequiredParameters()) {
+                            if (param.split(" ")[0].equals(reqParam)) {
+                                recognised = true;
+                                break;
+                            }
+                        }
+
+                        if (recognised) break;
+
+                        for (String optionalParam: modgetCreateCommand.getOptionalParameters()) {
+                            if (param.split(" ")[0].equals(optionalParam)) {
+                                recognised = true;
+                                break;
+                            }
+                        }
+
+                        if (!recognised) {
+                            modgetCreateCommand.sendHelpMessage();
+                            return;
+                        }
+                    }
+
+                    modgetCreateCommand.onCommand(params);
                 }
             }
 
         }
+        modgetCreateCommands.get(helpCommandPos).onCommand(List.of());
     }
 
     @Override
