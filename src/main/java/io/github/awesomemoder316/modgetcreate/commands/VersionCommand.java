@@ -2,13 +2,21 @@ package io.github.awesomemoder316.modgetcreate.commands;
 
 import com.diogonunes.jcolor.Attribute;
 
+import javax.inject.Inject;
+import javax.inject.Named;
 import java.io.IOException;
 import java.util.List;
 import java.util.Properties;
 
 import static com.diogonunes.jcolor.Ansi.colorize;
 
+@Named("version command")
 public class VersionCommand implements IModgetCreateCommand {
+
+    @Inject
+    public VersionCommand() {
+
+    }
 
     @Override
     public void onCommand(List<String> args) {

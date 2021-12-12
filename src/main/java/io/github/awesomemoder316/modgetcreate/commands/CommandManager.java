@@ -1,21 +1,37 @@
 package io.github.awesomemoder316.modgetcreate.commands;
 
+import com.diogonunes.jcolor.Attribute;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.diogonunes.jcolor.Ansi.colorize;
+
+@Singleton
+@Named("command manager")
 public class CommandManager implements ICommandManager {
     private final List<IModgetCreateCommand> modgetCreateCommands = new ArrayList<>();
-    private int helpCommandPos;
+    private final IModgetCreateCommand helpCommand; //Fallback if nothing is found.
 
-    //TODO(Make this a singleton via DI software)
-    public CommandManager() {
+    @Inject
+    public CommandManager(
+            @Named("exit command") IModgetCreateCommand exitCommand,
+            @Named("help command") IModgetCreateCommand helpCommand,
+            @Named("version command") IModgetCreateCommand versionCommand
+    ) {
+        this.helpCommand = helpCommand;
 
+        this.addCommand(exitCommand)
+                .addCommand(helpCommand)
+                .addCommand(versionCommand);
     }
 
     @Override
     public ICommandManager addCommand(IModgetCreateCommand command) {
         modgetCreateCommands.add(command);
-        if (command instanceof HelpCommand) helpCommandPos = modgetCreateCommands.size() - 1;
         return this;
     }
 
@@ -36,7 +52,7 @@ public class CommandManager implements ICommandManager {
 
             if (splitCmd[x].startsWith("-") || splitCmd[x].startsWith("--")) {
                 if (x + 1 < splitCmd.length &&
-                        !splitCmd[x + 1].startsWith("-") && splitCmd[x + 1].startsWith("--")) {
+                        !splitCmd[x + 1].startsWith("-") && !splitCmd[x + 1].startsWith("--")) {
                     params.add(splitCmd[x] + " " + splitCmd[x + 1]);
                 } else {
                     params.add(splitCmd[x]);
@@ -91,11 +107,18 @@ public class CommandManager implements ICommandManager {
                     }
 
                     modgetCreateCommand.onCommand(params);
+                    return;
                 }
             }
 
         }
-        modgetCreateCommands.get(helpCommandPos).onCommand(List.of());
+        System.out.println(
+                colorize(
+                        "Invalid command! Showing \"help\" command...",
+                        Attribute.RED_TEXT()
+                )
+        );
+        helpCommand.onCommand(List.of());
     }
 
     @Override
