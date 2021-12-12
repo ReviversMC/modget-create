@@ -1,14 +1,8 @@
 package io.github.awesomemoder316.modgetcreate;
 
-import com.diogonunes.jcolor.Attribute;
-import io.github.awesomemoder316.modgetcreate.commands.CommandManager;
-import io.github.awesomemoder316.modgetcreate.commands.ExitCommand;
-import io.github.awesomemoder316.modgetcreate.commands.ICommandManager;
-import io.github.awesomemoder316.modgetcreate.commands.VersionCommand;
+import io.github.awesomemoder316.modgetcreate.commands.*;
 
 import java.util.Scanner;
-
-import static com.diogonunes.jcolor.Ansi.colorize;
 
 public class ModgetCreateCE {
 
@@ -47,14 +41,15 @@ OkHttpClient okHttpClient = new OkHttpClient.Builder()
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        ICommandManager commandManager = new CommandManager();
-        commandManager.addCommand(new ExitCommand())
-                .addCommand(new VersionCommand());
+
+        CommandManagerComponent commandManagerComponent = DaggerCommandManagerComponent.create();
+        ICommandManager commandManager = commandManagerComponent.getCommandManager();
+
 
         //noinspection InfiniteLoopStatement, It is not an infinite loop as "Exit" command can be called.
         while (true) {
             System.out.print("Modget-Create-CE> ");
-            commandManager.callCommand(scanner.next());
+            commandManager.callCommand(scanner.nextLine());
         }
     }
 }
