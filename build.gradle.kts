@@ -23,7 +23,6 @@ dependencies {
 }
 
 tasks {
-
     compileJava {
         options.release.set(11)
     }
@@ -42,11 +41,11 @@ tasks {
                         "${File.separator}version.properties"
             )
 
-            val versionProperties = Properties();
+            val versionProperties = Properties()
             versionProperties.setProperty("ModgetCreateVersion", "v${rootProject.version}")
             versionProperties.setProperty("ModgetManifestVersion", supportedManifestVersion)
             versionProperties.store(fileOutputStream,
-                "A file that contains ModgetCE version, and the targetted manifest version")
+                "A file that contains ModgetCE's version, and the targeted manifest version")
 
             fileOutputStream.close()
         }
@@ -54,6 +53,11 @@ tasks {
 
     shadowJar {
         archiveFileName.set(rootProject.name + "-" + rootProject.version + ".jar")
+
+        relocate("com.diogonunes:JColor", "${rootProject.group}.dependencies.jcolor")
+        relocate("com.google.dagger", "${rootProject.group}.dependencies.dagger")
+        relocate("com.squareup.okhttp3", "${rootProject.group}.dependencies.okhttp3")
+
     }
 
     jar {
