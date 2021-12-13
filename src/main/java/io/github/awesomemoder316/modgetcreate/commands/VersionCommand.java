@@ -11,7 +11,7 @@ import java.util.Properties;
 import static com.diogonunes.jcolor.Ansi.colorize;
 
 @Named("version command")
-public class VersionCommand implements IModgetCreateCommand {
+public class VersionCommand implements Command {
 
     @Inject
     public VersionCommand() {

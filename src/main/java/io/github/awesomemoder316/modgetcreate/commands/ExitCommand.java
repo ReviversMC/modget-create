@@ -3,13 +3,11 @@ package io.github.awesomemoder316.modgetcreate.commands;
 import com.diogonunes.jcolor.Attribute;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 import java.util.List;
 
 import static com.diogonunes.jcolor.Ansi.colorize;
 
-@Named("exit command")
-public class ExitCommand implements IModgetCreateCommand {
+public class ExitCommand implements Command {
 
     @Inject
     public ExitCommand() {

@@ -2,22 +2,35 @@ package io.github.awesomemoder316.modgetcreate.commands;
 
 import dagger.Binds;
 import dagger.Module;
+import dagger.Provides;
+import dagger.multibindings.IntoSet;
 
 import javax.inject.Named;
 
+
 @Module
 public interface ModgetCreateCommandModule {
+        @Binds
+        CommandManager commandManager(MCCECommandManager impl);
 
-        @Binds @Named("command manager")
-        ICommandManager bindCommandManager (CommandManager commandManager);
+        @Binds
+        @IntoSet
+        Command exitCommand(ExitCommand impl);
 
-        @Binds @Named("exit command")
-        IModgetCreateCommand bindExitCommand (ExitCommand impl);
+        @Binds
+        @IntoSet
+        Command helpCommand(HelpCommand impl);
 
-        @Binds @Named("help command")
-        IModgetCreateCommand bindHelpCommand (HelpCommand impl);
+        @Binds
+        @IntoSet
+        Command versionCommand(VersionCommand impl);
 
-        @Binds @Named("version command")
-        IModgetCreateCommand bindVersionCommand (VersionCommand impl);
-
+        @Module
+        class DefaultCommandNameModule {
+                @Provides
+                @Named("default command name")
+                public static String defaultCommandName() {
+                        return "help";
+                }
+        }
 }

@@ -3,15 +3,11 @@ package io.github.awesomemoder316.modgetcreate.commands;
 import com.diogonunes.jcolor.Attribute;
 
 import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
 import java.util.List;
 
 import static com.diogonunes.jcolor.Ansi.colorize;
 
-@Singleton
-@Named("help command")
-public class HelpCommand implements IModgetCreateCommand {
+public class HelpCommand implements Command {
 
     @Inject
     public HelpCommand() {
@@ -27,10 +23,9 @@ public class HelpCommand implements IModgetCreateCommand {
             if (splitArg.length > 1) {
                 String param = splitArg[1];
 
-                CommandManagerComponent cMC = DaggerCommandManagerComponent.create();
-
                 //--help should never be a valid param, but should call the help message for the command.
-                cMC.getCommandManager().callCommand(param + " --help");
+                //If anyone can find a better way to do this via di, please pr.
+                DaggerCommandManagerComponent.create().getCommandManager().callCommand(param + " --help");
                 return; //If the call fails, another instance of this#onCommand() will be called anyway.
 
             }
@@ -39,9 +34,9 @@ public class HelpCommand implements IModgetCreateCommand {
         System.out.println(
                 colorize(
                         "Displaying all available commands:\n" +
-                                "\"end\", \"exit\", \"stop\", \"quit\": Shut down Modget-Create-CE.\n" +
+                                "\"end\"; \"exit\"; \"stop\"; \"quit\": Shut down Modget-Create-CE.\n" +
                                 "\"help\": This current command.\n" +
-                                "\"supported\", \"ver\", \"version\": Get the version of MCCE, and the supported manifest version.\n" +
+                                "\"supported\"; \"ver\"; \"version\": Get the version of MCCE, and the supported manifest version.\n" +
                                 "To get info on args/parameters/flags on a command, do \"help -i <command>\".",
                         Attribute.CYAN_TEXT()
                 )
