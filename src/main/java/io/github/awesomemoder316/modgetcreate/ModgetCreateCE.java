@@ -1,6 +1,8 @@
 package io.github.awesomemoder316.modgetcreate;
 
-import io.github.awesomemoder316.modgetcreate.commands.*;
+import io.github.awesomemoder316.modgetcreate.commands.CommandManager;
+import io.github.awesomemoder316.modgetcreate.commands.CommandManagerComponent;
+import io.github.awesomemoder316.modgetcreate.commands.DaggerCommandManagerComponent;
 
 import java.util.Scanner;
 
@@ -43,8 +45,7 @@ OkHttpClient okHttpClient = new OkHttpClient.Builder()
         Scanner scanner = new Scanner(System.in);
 
         CommandManagerComponent commandManagerComponent = DaggerCommandManagerComponent.create();
-        ICommandManager commandManager = commandManagerComponent.getCommandManager();
-
+        CommandManager commandManager = commandManagerComponent.getCommandManager();
 
         //noinspection InfiniteLoopStatement, It is not an infinite loop as "Exit" command can be called.
         while (true) {
