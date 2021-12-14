@@ -11,7 +11,7 @@ import javax.inject.Named;
 @Module
 public interface ModgetCreateCommandModule {
         @Binds
-        CommandManager commandManager(MCCECommandManager impl);
+        CommandManager commandManager(MCCommandManager impl);
 
         @Binds
         @IntoSet

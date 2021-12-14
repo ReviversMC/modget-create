@@ -26,7 +26,7 @@ public class VersionCommand implements Command {
             versionProperties.load(getClass().getClassLoader().getResourceAsStream("version.properties"));
             System.out.println(
                     colorize(
-                    "Modget-Create-CE Version: " + versionProperties.getProperty("ModgetCreateVersion") + "\n" +
+                    "Modget-Create Version: " + versionProperties.getProperty("ModgetCreateVersion") + "\n" +
                             "Supported Modget Manifest Version: " + versionProperties.getProperty("ModgetManifestVersion"),
                             Attribute.GREEN_TEXT()
                     )
@@ -43,7 +43,7 @@ public class VersionCommand implements Command {
 
     @Override
     public String getDescription() {
-        return "This command lists the version of Modget-Create-CE," +
+        return "This command lists the version of Modget-Create," +
                 " and the manifest version that will be created by it.\n" +
                 "There are no parameters for this command.";
     }

@@ -40,7 +40,7 @@ public interface Command {
 
     /**
      * This function is called when the appropriate command is invoked.
-     * @param args A list of arguments (or parameters as it is referred to multiple times in MCCE)
+     * @param args A list of arguments (or parameters as it is referred to multiple times in modget-create)
      *             that can be used.
      */
     void onCommand(List<String> args);

@@ -18,7 +18,7 @@ public class ExitCommand implements Command {
     public void onCommand(List<String> args) {
         System.out.println(
                 colorize(
-                        "Modget-Create-CE is shutting down...", Attribute.GREEN_TEXT()
+                        "Modget-Create is shutting down...", Attribute.GREEN_TEXT()
                 )
         );
         System.exit(0);
@@ -31,8 +31,8 @@ public class ExitCommand implements Command {
 
     @Override
     public String getDescription() {
-        return "This command stops Modget-Create-CE.\n" +
-                "Your github token, if entered, will be forgotten by MCCE.\n" +
+        return "This command stops Modget-Create.\n" +
+                "Your github token, if entered, will be forgotten by modget-create.\n" +
                 "There are no parameters for this command.";
     }
 

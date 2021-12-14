@@ -6,7 +6,7 @@ import io.github.awesomemoder316.modgetcreate.commands.DaggerCommandManagerCompo
 
 import java.util.Scanner;
 
-public class ModgetCreateCE {
+public class ModgetCreate {
 
     /*public static void main(String[] args) {
         CookieManager cookieManager = new CookieManager();
@@ -49,7 +49,7 @@ OkHttpClient okHttpClient = new OkHttpClient.Builder()
 
         //noinspection InfiniteLoopStatement, It is not an infinite loop as "Exit" command can be called.
         while (true) {
-            System.out.print("Modget-Create-CE> ");
+            System.out.print("Modget-Create> ");
             commandManager.callCommand(scanner.nextLine());
         }
     }

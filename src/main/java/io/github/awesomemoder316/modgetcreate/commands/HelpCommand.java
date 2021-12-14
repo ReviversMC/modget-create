@@ -34,9 +34,9 @@ public class HelpCommand implements Command {
         System.out.println(
                 colorize(
                         "Displaying all available commands:\n" +
-                                "\"end\"; \"exit\"; \"stop\"; \"quit\": Shut down Modget-Create-CE.\n" +
+                                "\"end\"; \"exit\"; \"stop\"; \"quit\": Shut down Modget-Create.\n" +
                                 "\"help\": This current command.\n" +
-                                "\"supported\"; \"ver\"; \"version\": Get the version of MCCE, and the supported manifest version.\n" +
+                                "\"supported\"; \"ver\"; \"version\": Get the version of modget-create, and the supported manifest version.\n" +
                                 "To get info on args/parameters/flags on a command, do \"help -i <command>\".",
                         Attribute.CYAN_TEXT()
                 )
