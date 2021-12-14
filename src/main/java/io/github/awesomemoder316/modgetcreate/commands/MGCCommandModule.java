@@ -9,9 +9,9 @@ import javax.inject.Named;
 
 
 @Module
-public interface ModgetCreateCommandModule {
+public interface MGCCommandModule {
         @Binds
-        CommandManager commandManager(MCCommandManager impl);
+        CommandManager commandManager(MGCCommandManager impl);
 
         @Binds
         @IntoSet

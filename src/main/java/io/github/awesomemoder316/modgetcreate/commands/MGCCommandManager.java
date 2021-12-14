@@ -10,13 +10,13 @@ import java.util.Set;
 
 import static com.diogonunes.jcolor.Ansi.colorize;
 
-public class MCCommandManager implements CommandManager {
+public class MGCCommandManager implements CommandManager {
     private final Set<Command> modgetCreateCommands;
     private final String defaultCommandName;
 
     @Inject
-    public MCCommandManager(Set<Command> modgetCreateCommands,
-                            @Named("default command name") String defaultCommandName) {
+    public MGCCommandManager(Set<Command> modgetCreateCommands,
+                             @Named("default command name") String defaultCommandName) {
         this.modgetCreateCommands = modgetCreateCommands;
         this.defaultCommandName = defaultCommandName;
     }
