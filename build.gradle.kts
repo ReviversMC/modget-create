@@ -62,7 +62,7 @@ tasks {
 
     jar {
         manifest {
-            attributes["Main-Class"] = "${rootProject.group}.ModgetCreateCE"
+            attributes["Main-Class"] = "${rootProject.group}.ModgetCreate"
         }
     }
 }
