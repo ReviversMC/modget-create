@@ -1,0 +1,11 @@
+pluginManagement {
+    repositories {
+        mavenLocal()
+        gradlePluginPortal()
+    }
+}
+
+rootProject.name = 'modget-create'
+
+include 'modget-create-core'
+include 'modget-create-cli'
