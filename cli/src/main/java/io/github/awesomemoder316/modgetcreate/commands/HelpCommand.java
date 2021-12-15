@@ -53,7 +53,7 @@ public class HelpCommand implements Command {
     @Override
     public String getDescription() {
         return "This command lists the usage of all available commands.\n" +
-                "Parameters:\n" +
+                "Parameters definitions:\n" +
                 "-i <command>, --info <command>: Get more information on a command, as specified in <command>.";
     }
 
