@@ -3,4 +3,4 @@
 .idea
 .gradle
 build
-src/main/resources/version.properties
+core/src/main/resources/version.properties
