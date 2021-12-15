@@ -1,4 +1,4 @@
-package io.github.awesomemoder316.modgetcreate.commands;
+package com.github.reviversmc.modget.create.cli.commands;
 
 /**
  * There is no method to add commands,

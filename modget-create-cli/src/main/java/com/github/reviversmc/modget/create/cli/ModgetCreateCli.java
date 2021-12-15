@@ -1,10 +1,9 @@
-package io.github.awesomemoder316.modgetcreate;
-
-import io.github.awesomemoder316.modgetcreate.commands.CommandManager;
-import io.github.awesomemoder316.modgetcreate.commands.CommandManagerComponent;
-import io.github.awesomemoder316.modgetcreate.commands.DaggerCommandManagerComponent;
+package com.github.reviversmc.modget.create.cli;
 
 import java.util.Scanner;
+
+import com.github.reviversmc.modget.create.cli.commands.CommandManager;
+import com.github.reviversmc.modget.create.cli.commands.CommandManagerComponent;
 
 public class ModgetCreateCli {
 

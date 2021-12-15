@@ -1,11 +1,12 @@
-package io.github.awesomemoder316.modgetcreate.dependencies;
+package com.github.reviversmc.modget.create.dependencies;
+
+import javax.inject.Singleton;
 
 import com.squareup.moshi.Moshi;
+
 import dagger.Module;
 import dagger.Provides;
 import okhttp3.OkHttpClient;
-
-import javax.inject.Singleton;
 
 @Module
 public interface DependencyModule {

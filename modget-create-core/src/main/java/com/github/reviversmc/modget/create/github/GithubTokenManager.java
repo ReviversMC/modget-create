@@ -1,19 +1,26 @@
-package io.github.awesomemoder316.modgetcreate.github;
+package com.github.reviversmc.modget.create.github;
 
-import com.diogonunes.jcolor.Attribute;
-import com.squareup.moshi.JsonAdapter;
-import com.squareup.moshi.Moshi;
-import io.github.awesomemoder316.modgetcreate.github.json.OAuthAccessTokenJson;
-import io.github.awesomemoder316.modgetcreate.github.json.OAuthVerifyCodeJson;
-import okhttp3.*;
+import static com.diogonunes.jcolor.Ansi.colorize;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
 import java.io.IOException;
 import java.util.Objects;
 import java.util.Optional;
 
-import static com.diogonunes.jcolor.Ansi.colorize;
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+import com.diogonunes.jcolor.Attribute;
+import com.github.reviversmc.modget.create.github.json.OAuthAccessTokenJson;
+import com.github.reviversmc.modget.create.github.json.OAuthVerifyCodeJson;
+import com.squareup.moshi.JsonAdapter;
+import com.squareup.moshi.Moshi;
+
+import okhttp3.FormBody;
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 
 @Singleton
 public class GithubTokenManager implements TokenManager {

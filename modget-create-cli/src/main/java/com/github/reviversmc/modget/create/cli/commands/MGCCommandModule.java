@@ -1,12 +1,12 @@
-package io.github.awesomemoder316.modgetcreate.commands;
+package com.github.reviversmc.modget.create.cli.commands;
+
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import dagger.Binds;
 import dagger.Module;
 import dagger.Provides;
 import dagger.multibindings.IntoSet;
-
-import javax.inject.Named;
-import javax.inject.Singleton;
 
 
 @Module

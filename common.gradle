@@ -1,7 +1,8 @@
 sourceCompatibility = JavaVersion.VERSION_11
 targetCompatibility = JavaVersion.VERSION_11
 
-group = project.maven_group as Object
+group = project.maven_group
+version = project.version
 
 configurations {
     includeTransitive {

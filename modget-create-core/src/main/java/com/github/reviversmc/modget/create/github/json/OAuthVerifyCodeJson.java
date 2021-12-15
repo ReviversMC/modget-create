@@ -1,4 +1,4 @@
-package io.github.awesomemoder316.modgetcreate.github.json;
+package com.github.reviversmc.modget.create.github.json;
 
 /**
  * All variables follow lower_underscore_case, as that is the response given by Github.

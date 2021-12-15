@@ -1,4 +1,4 @@
-package io.github.awesomemoder316.modgetcreate.github.json;
+package com.github.reviversmc.modget.create.github.json;
 
 public class OAuthAccessTokenJson {
     private final String access_token;

@@ -3,9 +3,6 @@ plugins {
     id 'com.github.johnrengelman.shadow' version '7.0.0'
 }
 
-group = project.maven_group
-version = project.version
-
 apply from: '../common.gradle'
 
 dependencies {

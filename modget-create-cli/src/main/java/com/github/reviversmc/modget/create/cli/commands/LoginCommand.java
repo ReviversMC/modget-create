@@ -1,10 +1,11 @@
-package io.github.awesomemoder316.modgetcreate.commands;
+package com.github.reviversmc.modget.create.cli.commands;
 
-import io.github.awesomemoder316.modgetcreate.github.TokenManager;
+import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import java.util.List;
+
+import com.github.reviversmc.modget.create.github.TokenManager;
 
 @Named("login command")
 public class LoginCommand implements Command {

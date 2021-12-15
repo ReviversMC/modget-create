@@ -1,11 +1,12 @@
-package io.github.awesomemoder316.modgetcreate.commands;
-
-import com.diogonunes.jcolor.Attribute;
-
-import javax.inject.Inject;
-import java.util.List;
+package com.github.reviversmc.modget.create.cli.commands;
 
 import static com.diogonunes.jcolor.Ansi.colorize;
+
+import java.util.List;
+
+import javax.inject.Inject;
+
+import com.diogonunes.jcolor.Attribute;
 
 public class HelpCommand implements Command {
 

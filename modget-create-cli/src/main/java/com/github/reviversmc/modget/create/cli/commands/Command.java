@@ -1,10 +1,10 @@
-package io.github.awesomemoder316.modgetcreate.commands;
+package com.github.reviversmc.modget.create.cli.commands;
 
-import com.diogonunes.jcolor.Attribute;
+import static com.diogonunes.jcolor.Ansi.colorize;
 
 import java.util.List;
 
-import static com.diogonunes.jcolor.Ansi.colorize;
+import com.diogonunes.jcolor.Attribute;
 
 public interface Command {
 

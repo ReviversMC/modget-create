@@ -1,4 +1,4 @@
-package io.github.awesomemoder316.modgetcreate.github;
+package com.github.reviversmc.modget.create.github;
 
 import java.util.Optional;
 

@@ -1,10 +1,11 @@
-package io.github.awesomemoder316.modgetcreate.commands;
-
-import dagger.Component;
-import io.github.awesomemoder316.modgetcreate.dependencies.DependencyModule;
-import io.github.awesomemoder316.modgetcreate.github.TokenManagerModule;
+package com.github.reviversmc.modget.create.cli.commands;
 
 import javax.inject.Singleton;
+
+import com.github.reviversmc.modget.create.dependencies.DependencyModule;
+import com.github.reviversmc.modget.create.github.TokenManagerModule;
+
+import dagger.Component;
 
 @Component(modules = {
         DependencyModule.class,

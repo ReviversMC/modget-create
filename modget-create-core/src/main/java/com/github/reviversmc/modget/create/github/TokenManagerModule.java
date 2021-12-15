@@ -1,9 +1,9 @@
-package io.github.awesomemoder316.modgetcreate.github;
+package com.github.reviversmc.modget.create.github;
+
+import javax.inject.Singleton;
 
 import dagger.Binds;
 import dagger.Module;
-
-import javax.inject.Singleton;
 
 @Module
 public interface TokenManagerModule {

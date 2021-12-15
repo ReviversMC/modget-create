@@ -1,14 +1,15 @@
-package io.github.awesomemoder316.modgetcreate.commands;
+package com.github.reviversmc.modget.create.cli.commands;
 
-import com.diogonunes.jcolor.Attribute;
+import static com.diogonunes.jcolor.Ansi.colorize;
 
-import javax.inject.Inject;
-import javax.inject.Named;
 import java.io.IOException;
 import java.util.List;
 import java.util.Properties;
 
-import static com.diogonunes.jcolor.Ansi.colorize;
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import com.diogonunes.jcolor.Attribute;
 
 @Named("version command")
 public class VersionCommand implements Command {
