@@ -1,6 +1,29 @@
-
-
-.idea
-.gradle
-build
+# general
 core/src/main/resources/version.properties
+
+# gradle
+.gradle/
+build/
+out/
+classes/
+
+# eclipse
+*.launch
+
+# idea
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# vscode
+.settings/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+bin/
+.classpath
+.project
+
+# macos
+*.DS_Store
