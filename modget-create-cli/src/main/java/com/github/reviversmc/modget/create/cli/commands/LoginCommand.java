@@ -5,7 +5,10 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import com.diogonunes.jcolor.Attribute;
 import com.github.reviversmc.modget.create.github.TokenManager;
+
+import static com.diogonunes.jcolor.Ansi.colorize;
 
 @Named("login command")
 public class LoginCommand implements Command {
@@ -32,7 +35,21 @@ public class LoginCommand implements Command {
             }
         }
 
-        tokenManager.setToken(token);
+        if (tokenManager.setToken(token)) {
+            System.out.println(
+                    colorize(
+                            "Login success!",
+                            Attribute.GREEN_TEXT()
+                    )
+            );
+        } else {
+            System.out.println(
+                    colorize(
+                            "Login failed! Perhaps you had incorrect scopes or an invalid token?",
+                            Attribute.RED_TEXT()
+                    )
+            );
+        }
 
     }
 
