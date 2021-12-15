@@ -45,7 +45,7 @@ public class GithubTokenManager implements TokenManager {
 
     @Override
     public boolean oAuth() {
-        String clientId = System.getenv("modgetCreateBotId");
+        String clientId = "3cd493499ff6e8c086c9";
         try {
 
             RequestBody verifyCodeRequestBody = new FormBody.Builder()
