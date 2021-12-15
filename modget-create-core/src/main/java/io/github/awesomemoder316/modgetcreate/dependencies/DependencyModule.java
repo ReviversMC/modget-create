@@ -3,17 +3,22 @@ package io.github.awesomemoder316.modgetcreate.dependencies;
 import com.squareup.moshi.Moshi;
 import dagger.Binds;
 import dagger.Module;
+import dagger.Provides;
 import okhttp3.OkHttpClient;
 
 import javax.inject.Singleton;
 
 @Module
 public interface DependencyModule {
-    @Binds
+    @Provides
     @Singleton
-    Moshi moshi(Moshi impl);
+    static Moshi moshi() {
+        return new Moshi.Builder().build();
+    }
 
-    @Binds
+    @Provides
     @Singleton
-    OkHttpClient okhttpClient(OkHttpClient impl);
+    static OkHttpClient okhttpClient() {
+        return new OkHttpClient.Builder().build();
+    }
 }
