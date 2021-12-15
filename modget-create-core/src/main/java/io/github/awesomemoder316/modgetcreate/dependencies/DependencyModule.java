@@ -1,7 +1,6 @@
 package io.github.awesomemoder316.modgetcreate.dependencies;
 
 import com.squareup.moshi.Moshi;
-import dagger.Binds;
 import dagger.Module;
 import dagger.Provides;
 import okhttp3.OkHttpClient;

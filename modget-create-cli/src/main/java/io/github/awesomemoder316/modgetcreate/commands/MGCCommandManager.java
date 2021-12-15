@@ -4,7 +4,6 @@ import com.diogonunes.jcolor.Attribute;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Singleton;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
