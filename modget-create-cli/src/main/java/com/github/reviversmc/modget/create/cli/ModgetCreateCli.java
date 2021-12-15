@@ -4,6 +4,7 @@ import java.util.Scanner;
 
 import com.github.reviversmc.modget.create.cli.commands.CommandManager;
 import com.github.reviversmc.modget.create.cli.commands.CommandManagerComponent;
+import com.github.reviversmc.modget.create.cli.commands.DaggerCommandManagerComponent;
 
 public class ModgetCreateCli {
 
