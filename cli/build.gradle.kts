@@ -22,7 +22,7 @@ tasks {
 
     jar {
         manifest {
-            attributes["Main-Class"] = "${rootProject.group}.ModgetCreate"
+            attributes["Main-Class"] = "${rootProject.group}.ModgetCreateCli"
         }
     }
 
