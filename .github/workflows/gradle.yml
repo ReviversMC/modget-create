@@ -25,7 +25,11 @@ jobs:
       with:
         java-version: '11'
         distribution: 'adopt'
-    - name: shadowJar modget-create-cli
+    - name: ShadowJar modget-create-core
+      uses: gradle/gradle-build-action@4137be6a8bf7d7133955359dbd952c0ca73b1021
+      with:
+        arguments: :modget-create-core:shadowJar
+    - name: ShadowJar modget-create-cli
       uses: gradle/gradle-build-action@4137be6a8bf7d7133955359dbd952c0ca73b1021
       with:
         arguments: :modget-create-cli:shadowJar
