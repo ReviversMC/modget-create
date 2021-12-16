@@ -55,7 +55,7 @@ public class LoginCommand implements Command {
 
     @Override
     public List<String> getCommandNames() {
-        return List.of("gh", "git", "github", "login", "token");
+        return List.of("auth", "authenticate", "gh", "git", "github", "login", "token");
     }
 
     @Override

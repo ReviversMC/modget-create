@@ -2,7 +2,7 @@ package com.github.reviversmc.modget.create.dependencies;
 
 import javax.inject.Singleton;
 
-import com.squareup.moshi.Moshi;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import dagger.Module;
 import dagger.Provides;
@@ -12,8 +12,8 @@ import okhttp3.OkHttpClient;
 public interface DependencyModule {
     @Provides
     @Singleton
-    static Moshi moshi() {
-        return new Moshi.Builder().build();
+    static ObjectMapper objectMapper() {
+        return new ObjectMapper();
     }
 
     @Provides

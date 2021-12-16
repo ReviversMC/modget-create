@@ -10,10 +10,9 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import com.diogonunes.jcolor.Attribute;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.reviversmc.modget.create.github.json.OAuthAccessTokenJson;
 import com.github.reviversmc.modget.create.github.json.OAuthVerifyCodeJson;
-import com.squareup.moshi.JsonAdapter;
-import com.squareup.moshi.Moshi;
 
 import okhttp3.FormBody;
 import okhttp3.MediaType;
@@ -24,14 +23,14 @@ import okhttp3.Response;
 
 @Singleton
 public class GithubTokenManager implements TokenManager {
-    private final Moshi moshi;
+    private final ObjectMapper objectMapper;
     @SuppressWarnings("FieldCanBeLocal") private String oAuthDeviceId;
     private final OkHttpClient okHttpClient;
     private String githubToken;
 
     @Inject
-    public GithubTokenManager(Moshi moshi, OkHttpClient okHttpClient) {
-        this.moshi = moshi;
+    public GithubTokenManager(ObjectMapper objectMapper, OkHttpClient okHttpClient) {
+        this.objectMapper = objectMapper;
         this.okHttpClient = okHttpClient;
     }
 
@@ -68,14 +67,13 @@ public class GithubTokenManager implements TokenManager {
 
             Response verifyCodeResponse = okHttpClient.newCall(verifyCodeRequest).execute();
 
-            JsonAdapter<OAuthVerifyCodeJson> verifyCodeAdapter = moshi.adapter(OAuthVerifyCodeJson.class);
 
-            OAuthVerifyCodeJson verifyCodeJson = verifyCodeAdapter.fromJson(
-                    Objects.requireNonNull(verifyCodeResponse.body()).string()
+            OAuthVerifyCodeJson verifyCodeJson = objectMapper.readValue(
+                    Objects.requireNonNull(verifyCodeResponse.body()).string(),
+                    OAuthVerifyCodeJson.class
             );
 
-            //Checking if it is null, so stop giving me NPE warnings.
-            //noinspection ConstantConditions
+
             if (verifyCodeJson.getVerificationUri() == null) {
                 //If this is null, resp failed. Else, all success.
                 System.out.println(
@@ -117,8 +115,6 @@ public class GithubTokenManager implements TokenManager {
                     .url("https://github.com/login/oauth/access_token")
                     .build();
 
-            JsonAdapter<OAuthAccessTokenJson> accessTokenAdapter = moshi.adapter(OAuthAccessTokenJson.class);
-
             //If another request is sent, and code changes, stop POSTing this instance.
             while (oAuthDeviceId.equals(verifyCodeJson.getDeviceCode())) {
 
@@ -127,11 +123,11 @@ public class GithubTokenManager implements TokenManager {
 
                 Response accessTokenResponse = okHttpClient.newCall(accessTokenRequest).execute();
 
-                OAuthAccessTokenJson accessTokenJson = accessTokenAdapter.fromJson(
-                        Objects.requireNonNull(accessTokenResponse.body()).string());
+                OAuthAccessTokenJson accessTokenJson = objectMapper.readValue(
+                        Objects.requireNonNull(accessTokenResponse.body()).string(),
+                        OAuthAccessTokenJson.class
+                );
 
-                //Checking if it is null, so stop giving me NPE warnings.
-                //noinspection ConstantConditions
                 if (accessTokenJson.getError() != null) {
 
                     switch (accessTokenJson.getError()) {
