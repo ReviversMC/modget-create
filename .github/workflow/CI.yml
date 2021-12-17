@@ -26,10 +26,12 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
     - name: ShadowJar modget-create-core
-      uses: gradle/gradle-build-action@4137be6a8bf7d7133955359dbd952c0ca73b1021
-      with:
-        arguments: :modget-create-core:shadowJar
+      run: ./gradlew :modget-create-core:shadowJar
     - name: ShadowJar modget-create-cli
-      uses: gradle/gradle-build-action@4137be6a8bf7d7133955359dbd952c0ca73b1021
+      run: ./gradlew :modget-create-cli:shadowJar
+    - name: Upload modget-create-core
+      uses: actions/upload-artifact@v2
       with:
-        arguments: :modget-create-cli:shadowJar
+        name: modget-create-cli-dev
+        path: /modget-create-cli/build/libs/*.jar
+
