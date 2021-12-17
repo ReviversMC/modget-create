@@ -1,5 +1,5 @@
 # general
-core/src/main/resources/version.properties
+modget-create-corecore/src/main/resources/version.properties
 
 # gradle
 .gradle/

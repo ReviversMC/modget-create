@@ -4,3 +4,28 @@ plugins {
 }
 
 apply from: '../common.gradle'
+
+tasks.create("createVersionFile") {
+    doLast {
+        String path = "${project.projectDir}" +
+                "${File.separator}src" +
+                "${File.separator}main" +
+                "${File.separator}resources" +
+                "${File.separator}version.properties"
+
+        def fileOutputStream = new FileOutputStream(path)
+        def versionProperties = new Properties()
+        versionProperties.setProperty("ModgetCreateVersion", "v${project.version}")
+        //noinspection GroovyAssignabilityCheck
+        versionProperties.setProperty("ModgetManifestVersion", project.supported_manifest_version)
+        versionProperties.store(
+                fileOutputStream,
+                "A file that contains ModgetCE's version, and the targeted manifest version."
+        )
+
+        fileOutputStream.close()
+
+    }
+}
+
+compileJava.dependsOn createVersionFile
