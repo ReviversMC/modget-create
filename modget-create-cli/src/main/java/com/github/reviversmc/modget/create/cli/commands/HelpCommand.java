@@ -17,24 +17,26 @@ public class HelpCommand implements Command {
 
     @Override
     public void onCommand(List<String> args) {
-        //Confirmed that this is a "-i" or "--info" arg, as there are no other accepted args.
+
         if (!args.isEmpty()) {
-            String[] splitArg = args.get(0).split(" ");
 
-            if (splitArg.length > 1) {
-                String param = splitArg[1];
+            for (String arg : args) {
+                if (arg.startsWith("-i ") || arg.startsWith("--info ")) {
+                    //--help should never be a valid param, but should call the help message for the command.
+                    //If anyone can find a better way to do this via di, please pr.
+                    DaggerCommandManagerComponent.create().getCommandManager().callCommand(
+                            arg.split(" ")[0] + " --help"
+                    );
+                    return; //If the call fails, another instance of this#onCommand() will be called anyway.
 
-                //--help should never be a valid param, but should call the help message for the command.
-                //If anyone can find a better way to do this via di, please pr.
-                DaggerCommandManagerComponent.create().getCommandManager().callCommand(param + " --help");
-                return; //If the call fails, another instance of this#onCommand() will be called anyway.
-
+                }
             }
         }
 
         System.out.println(
                 colorize(
                         "Displaying all available commands:\n" +
+                                "\"auth\", \"authenticate\", \"gh\", \"git\", \"github\", \"login\", \"token\": Authenticate with Github for automatic PRs." +
                                 "\"end\"; \"exit\"; \"stop\"; \"quit\": Shut down modget-create.\n" +
                                 "\"help\": This current command.\n" +
                                 "\"supported\"; \"ver\"; \"version\": Get the version of modget-create, and the supported manifest version.\n" +
