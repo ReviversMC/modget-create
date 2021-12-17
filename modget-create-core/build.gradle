@@ -13,7 +13,10 @@ tasks.create("createVersionFile") {
                 "${File.separator}resources" +
                 "${File.separator}version.properties"
 
-        def fileOutputStream = new FileOutputStream(path)
+        def versionFile = new File(path)
+        versionFile.parentFile.mkdirs()
+
+        def fileOutputStream = new FileOutputStream(versionFile)
         def versionProperties = new Properties()
         versionProperties.setProperty("ModgetCreateVersion", "v${project.version}")
         //noinspection GroovyAssignabilityCheck
