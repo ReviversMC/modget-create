@@ -25,7 +25,7 @@ public class HelpCommand implements Command {
                     //--help should never be a valid param, but should call the help message for the command.
                     //If anyone can find a better way to do this via di, please pr.
                     DaggerCommandManagerComponent.create().getCommandManager().callCommand(
-                            arg.split(" ")[0] + " --help"
+                            arg.split(" ")[1] + " --help"
                     );
                     return; //If the call fails, another instance of this#onCommand() will be called anyway.
 
