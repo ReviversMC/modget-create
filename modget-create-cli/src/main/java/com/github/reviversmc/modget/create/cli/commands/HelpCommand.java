@@ -40,7 +40,7 @@ public class HelpCommand implements Command {
         System.out.println(
                 colorize(
                         "Displaying all available commands:\n" +
-                                "\"auth\", \"authenticate\", \"gh\", \"git\", \"github\", \"login\", \"token\": Authenticate with Github for automatic PRs." +
+                                "\"auth\", \"authenticate\", \"gh\", \"git\", \"github\", \"login\", \"token\": Authenticate with Github for automatic PRs.\n" +
                                 "\"end\"; \"exit\"; \"stop\"; \"quit\": Shut down modget-create.\n" +
                                 "\"help\": This current command.\n" +
                                 "\"supported\"; \"ver\"; \"version\": Get the version of modget-create, and the supported manifest version.\n" +
