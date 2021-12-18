@@ -7,6 +7,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
 
 import com.diogonunes.jcolor.Attribute;
@@ -29,15 +30,17 @@ public class GithubTokenManager implements TokenManager {
     private String githubToken;
 
     @Inject
-    public GithubTokenManager(ObjectMapper objectMapper, OkHttpClient okHttpClient) {
+    public GithubTokenManager(@Named("json") ObjectMapper objectMapper, OkHttpClient okHttpClient) {
         this.objectMapper = objectMapper;
         this.okHttpClient = okHttpClient;
     }
 
     @Override
     public Optional<String> getToken() {
-        return githubToken == null ?
-                Optional.empty() : Optional.of(githubToken);
+        if (githubToken != null) return Optional.of(githubToken);
+
+        if (oAuth()) return Optional.of(githubToken); //Attempt to get user to oauth.
+        return Optional.empty();
     }
 
     @Override
@@ -174,7 +177,8 @@ public class GithubTokenManager implements TokenManager {
         return false;
     }
 
-    private boolean validateToken(String token) {
+    @Override
+    public boolean validateToken(String token) {
         //Start by checking the scope.
         RequestBody requestBody = RequestBody.create(
                 "query {" +

@@ -1,31 +1,37 @@
 package com.github.reviversmc.modget.create.github.json;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class OAuthAccessTokenJson {
-    private String access_token;
-    private String token_type;
+    private String accessToken;
+    private String tokenType;
     private String scope;
 
     private String error;
-    private String error_description;
-    private String error_uri;
+    private String errorDescription;
+    private String errorUri;
 
     public OAuthAccessTokenJson() {
     }
 
+    @JsonProperty("access_token")
     public String getAccessToken() {
-        return access_token;
+        return accessToken;
     }
 
-    public void setAccess_token(String access_token) {
-        this.access_token = access_token;
+    @JsonProperty("access_token")
+    public void setAccess_token(String accessToken) {
+        this.accessToken = accessToken;
     }
 
+    @JsonProperty("token_type")
     public String getTokenType() {
-        return token_type;
+        return tokenType;
     }
 
-    public void setToken_type(String token_type) {
-        this.token_type = token_type;
+    @JsonProperty("token_type")
+    public void setToken_type(String tokenType) {
+        this.tokenType = tokenType;
     }
 
     public String getScope() {
@@ -44,19 +50,23 @@ public class OAuthAccessTokenJson {
         this.error = error;
     }
 
+    @JsonProperty("error_description")
     public String getErrorDescription() {
-        return error_description;
+        return errorDescription;
     }
 
-    public void setError_description(String error_description) {
-        this.error_description = error_description;
+    @JsonProperty("error_description")
+    public void setError_description(String errorDescription) {
+        this.errorDescription = errorDescription;
     }
 
+    @JsonProperty("error_uri")
     public String getErrorUri() {
-        return error_uri;
+        return errorUri;
     }
 
-    public void setError_uri(String error_uri) {
-        this.error_uri = error_uri;
+    @JsonProperty("error_uri")
+    public void setErrorUri(String errorUri) {
+        this.errorUri = errorUri;
     }
 }

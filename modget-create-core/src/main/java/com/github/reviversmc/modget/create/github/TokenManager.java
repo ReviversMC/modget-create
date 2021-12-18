@@ -22,4 +22,5 @@ public interface TokenManager {
      */
     boolean setToken(String token);
 
+    boolean validateToken(String token);
 }

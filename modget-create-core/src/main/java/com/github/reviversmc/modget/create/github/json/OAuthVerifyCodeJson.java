@@ -1,50 +1,60 @@
 package com.github.reviversmc.modget.create.github.json;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 /**
  * All variables follow lower_underscore_case, as that is the response given by Github.
  */
 public class OAuthVerifyCodeJson {
 
-    private String device_code;
-    private String user_code;
-    private String verification_uri;
-    private int expires_in;
+    private String deviceCode;
+    private String userCode;
+    private String verificationUri;
+    private int expiresIn;
     private int interval;
 
     public OAuthVerifyCodeJson() {
 
     }
 
+    @JsonProperty("device_code")
     public String getDeviceCode() {
-        return device_code;
+        return deviceCode;
     }
 
-    public void setDevice_code(String device_code) {
-        this.device_code = device_code;
+    @JsonProperty("device_code")
+    public void setDeviceCode(String deviceCode) {
+        this.deviceCode = deviceCode;
     }
 
+    @JsonProperty("user_code")
     public String getUserCode() {
-        return user_code;
+        return userCode;
     }
 
-    public void setUser_code(String user_code) {
-        this.user_code = user_code;
+    @JsonProperty("user_code")
+    public void setUserCode(String userCode) {
+        this.userCode = userCode;
     }
 
+    @JsonProperty("verification_uri")
     public String getVerificationUri() {
-        return verification_uri;
+        return verificationUri;
     }
 
-    public void setVerification_uri(String verification_uri) {
-        this.verification_uri = verification_uri;
+    @JsonProperty("verification_uri")
+    public void setVerificationUri(String verificationUri) {
+        this.verificationUri = verificationUri;
     }
 
+    @JsonProperty("expires_in")
     public int getExpiresIn() {
-        return expires_in;
+        return expiresIn;
     }
 
-    public void setExpires_in(int expires_in) {
-        this.expires_in = expires_in;
+    @JsonProperty("expires_in")
+    public void setExpiresIn(int expiresIn) {
+        this.expiresIn = expiresIn;
     }
 
     public int getInterval() {
