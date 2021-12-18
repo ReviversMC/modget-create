@@ -9,6 +9,7 @@ import javax.inject.Inject;
 import com.diogonunes.jcolor.Attribute;
 
 public class HelpCommand implements Command {
+    private CommandManager commandManager;
 
     @Inject
     public HelpCommand() {
@@ -24,7 +25,10 @@ public class HelpCommand implements Command {
                 if (arg.startsWith("-i ") || arg.startsWith("--info ")) {
                     //--help should never be a valid param, but should call the help message for the command.
                     //If anyone can find a better way to do this via di, please pr.
-                    DaggerCommandManagerComponent.create().getCommandManager().callCommand(
+                    if (commandManager == null)
+                        commandManager = DaggerCommandManagerComponent.create().getCommandManager();
+
+                    commandManager.callCommand(
                             arg.split(" ")[1] + " --help"
                     );
                     return; //If the call fails, another instance of this#onCommand() will be called anyway.
