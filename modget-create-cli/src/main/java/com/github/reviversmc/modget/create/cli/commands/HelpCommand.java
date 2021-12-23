@@ -45,7 +45,7 @@ public class HelpCommand implements Command {
                                 "\"help\": This current command.\n" +
                                 "\"supported\"; \"ver\"; \"version\": Get the version of modget-create, and the supported manifest version.\n" +
                                 "To get info on args/parameters/flags on a command, do \"help -i <command>\".",
-                        Attribute.CYAN_TEXT()
+                        Attribute.GREEN_TEXT()
                 )
         );
 

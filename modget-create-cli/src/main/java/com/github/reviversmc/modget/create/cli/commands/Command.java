@@ -75,7 +75,7 @@ public interface Command {
         messageBuilder.append(".\n\n")
                         .append(getDescription());
 
-        System.out.println(colorize(messageBuilder.toString(), Attribute.CYAN_TEXT()));
+        System.out.println(colorize(messageBuilder.toString(), Attribute.GREEN_TEXT()));
     }
 
     /**

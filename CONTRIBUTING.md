@@ -8,7 +8,7 @@ Try as much as possible to name your class/interface according to what it does. 
 If you do not have much experience with "Dagger 2", you might find contributing a struggle.
 4. When printing to the console, please try as much as possible to {@link colorize} your messages according to this structure.
     - Red = Error/Function cancellations.
-    - Green = Success
-    - Cyan = General information
+    - Yellow = Warning
+    - Green = Success/info
 
 Congrats! You finished reading this boring chunk of text. That is all of our contributing guidelines - thanks for helping in advance!

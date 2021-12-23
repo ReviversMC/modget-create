@@ -15,7 +15,7 @@ public class ModgetCreateCli {
         System.out.println(
                 colorize(
                         "Starting modget-create...",
-                        Attribute.CYAN_TEXT()
+                        Attribute.GREEN_TEXT()
                 )
         );
         Scanner scanner = new Scanner(System.in);
