@@ -10,14 +10,29 @@ import javax.inject.Named;
 import com.diogonunes.jcolor.Attribute;
 
 public class MGCCommandManager implements CommandManager {
+    private final Command defaultCommand; //Being null means that the default command is not specified.
     private final Set<Command> modgetCreateCommands;
-    private final String defaultCommandName;
+
 
     @Inject
     public MGCCommandManager(Set<Command> modgetCreateCommands,
                              @Named("default command name") String defaultCommandName) {
         this.modgetCreateCommands = modgetCreateCommands;
-        this.defaultCommandName = defaultCommandName;
+
+        Command tempDefaultCommand = null;
+        for (Command command : modgetCreateCommands) {
+
+            for (String name : command.getCommandNames()) {
+                if (name.equals(defaultCommandName)) {
+                    tempDefaultCommand = command;
+                    break;
+                }
+            }
+
+            if (tempDefaultCommand != null) break;
+        }
+
+        this.defaultCommand = tempDefaultCommand;
     }
 
     @Override
@@ -28,7 +43,6 @@ public class MGCCommandManager implements CommandManager {
         Valid example: "publish --token realToken"
         Invalid example: "publish -t real token"
          */
-        Command defaultCommand = null;
         String[] splitCmd = commandWithParams.split(" ");
         String commandIssued = splitCmd[0];
         HashMap<String, Optional<String>> args = new HashMap<>();
@@ -48,15 +62,17 @@ public class MGCCommandManager implements CommandManager {
         for (Command command : modgetCreateCommands) {
 
             for (String name : command.getCommandNames()) {
-                if (name.equals(defaultCommandName)) defaultCommand = command;
 
+                //Try to find the appropriate command
                 if (commandIssued.equalsIgnoreCase(name)) {
 
                     for (List<String> reqParamList : command.getRequiredParameters()) {
                         boolean found = false;
 
                         for (String param : args.keySet()) {
-                            if (reqParamList.contains(param)) {
+                            if (reqParamList.contains(param) &&
+                                    //Protect against required params with no value
+                                    args.getOrDefault(param, Optional.empty()).isPresent()) {
                                 found = true;
                                 break;
                             }
