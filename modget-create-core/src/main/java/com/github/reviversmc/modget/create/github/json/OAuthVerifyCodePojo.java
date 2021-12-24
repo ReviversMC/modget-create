@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 /**
  * All variables follow lower_underscore_case, as that is the response given by Github.
  */
-public class OAuthVerifyCodeJson {
+public class OAuthVerifyCodePojo {
 
     private String deviceCode;
     private String userCode;
@@ -13,7 +13,7 @@ public class OAuthVerifyCodeJson {
     private int expiresIn;
     private int interval;
 
-    public OAuthVerifyCodeJson() {
+    public OAuthVerifyCodePojo() {
 
     }
 

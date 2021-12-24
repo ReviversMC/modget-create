@@ -2,7 +2,7 @@ package com.github.reviversmc.modget.create.github.json;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class OAuthAccessTokenJson {
+public class OAuthAccessTokenPojo {
     private String accessToken;
     private String tokenType;
     private String scope;
@@ -11,7 +11,7 @@ public class OAuthAccessTokenJson {
     private String errorDescription;
     private String errorUri;
 
-    public OAuthAccessTokenJson() {
+    public OAuthAccessTokenPojo() {
     }
 
     @JsonProperty("access_token")
@@ -20,7 +20,7 @@ public class OAuthAccessTokenJson {
     }
 
     @JsonProperty("access_token")
-    public void setAccess_token(String accessToken) {
+    public void setAccessToken(String accessToken) {
         this.accessToken = accessToken;
     }
 
@@ -30,7 +30,7 @@ public class OAuthAccessTokenJson {
     }
 
     @JsonProperty("token_type")
-    public void setToken_type(String tokenType) {
+    public void setTokenType(String tokenType) {
         this.tokenType = tokenType;
     }
 
