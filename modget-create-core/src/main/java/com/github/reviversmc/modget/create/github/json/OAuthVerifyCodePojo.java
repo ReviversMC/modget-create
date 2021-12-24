@@ -13,6 +13,10 @@ public class OAuthVerifyCodePojo {
     private int expiresIn;
     private int interval;
 
+    private String error;
+    private String errorDescription;
+    private String errorUri;
+
     public OAuthVerifyCodePojo() {
 
     }
@@ -63,5 +67,33 @@ public class OAuthVerifyCodePojo {
 
     public void setInterval(int interval) {
         this.interval = interval;
+    }
+
+    public String getError() {
+        return error;
+    }
+
+    public void setError(String error) {
+        this.error = error;
+    }
+
+    @JsonProperty("error_description")
+    public String getErrorDescription() {
+        return errorDescription;
+    }
+
+    @JsonProperty("error_description")
+    public void setError_description(String errorDescription) {
+        this.errorDescription = errorDescription;
+    }
+
+    @JsonProperty("error_uri")
+    public String getErrorUri() {
+        return errorUri;
+    }
+
+    @JsonProperty("error_uri")
+    public void setErrorUri(String errorUri) {
+        this.errorUri = errorUri;
     }
 }
