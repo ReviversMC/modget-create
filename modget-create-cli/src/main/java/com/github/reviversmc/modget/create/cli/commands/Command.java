@@ -3,6 +3,8 @@ package com.github.reviversmc.modget.create.cli.commands;
 import static com.diogonunes.jcolor.Ansi.colorize;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 import com.diogonunes.jcolor.Attribute;
 
@@ -43,7 +45,7 @@ public interface Command {
      * @param args A list of arguments (or parameters as it is referred to multiple times in modget-create)
      *             that can be used.
      */
-    void onCommand(List<String> args);
+    void onCommand(Map<String, Optional<String>> args);
 
     /**
      * Sends a help message for this command, which informs users of all available options.

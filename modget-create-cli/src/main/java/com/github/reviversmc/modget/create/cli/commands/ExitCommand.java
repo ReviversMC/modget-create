@@ -3,6 +3,8 @@ package com.github.reviversmc.modget.create.cli.commands;
 import static com.diogonunes.jcolor.Ansi.colorize;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 import javax.inject.Inject;
 
@@ -16,7 +18,7 @@ public class ExitCommand implements Command {
     }
 
     @Override
-    public void onCommand(List<String> args) {
+    public void onCommand(Map<String, Optional<String>> args) {
         System.out.println(
                 colorize(
                         "modget-create is shutting down...", Attribute.GREEN_TEXT()

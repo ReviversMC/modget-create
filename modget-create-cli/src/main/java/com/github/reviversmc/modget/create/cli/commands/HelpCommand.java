@@ -3,6 +3,8 @@ package com.github.reviversmc.modget.create.cli.commands;
 import static com.diogonunes.jcolor.Ansi.colorize;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 import javax.inject.Inject;
 
@@ -17,30 +19,39 @@ public class HelpCommand implements Command {
     }
 
     @Override
-    public void onCommand(List<String> args) {
+    public void onCommand(Map<String, Optional<String>> args) {
 
         if (!args.isEmpty()) {
 
-            for (String arg : args) {
-                if (arg.startsWith("-i ") || arg.startsWith("--info ")) {
-                    //--help should never be a valid param, but should call the help message for the command.
-                    //If anyone can find a better way to do this via di, please pr.
-                    if (commandManager == null)
-                        commandManager = DaggerCommandManagerComponent.create().getCommandManager();
+            Optional<String> optionalInfo = args.getOrDefault("-i", Optional.empty());
+            if (optionalInfo.isEmpty())
+                optionalInfo = args.getOrDefault("--info", Optional.empty());
 
-                    commandManager.callCommand(
-                            arg.split(" ")[1] + " --help"
-                    );
-                    return; //If the call fails, another instance of this#onCommand() will be called anyway.
-
-                }
+            if (optionalInfo.isEmpty()) { //Should never happen.
+                System.out.println(
+                        colorize(
+                                "An unexpected error occurred!",
+                                Attribute.RED_TEXT()
+                        )
+                );
+                return;
             }
+
+            if (commandManager == null)
+                commandManager = DaggerCommandManagerComponent.create().getCommandManager();
+
+            commandManager.callCommand(
+                    optionalInfo.get() + " --help"
+            );
+
+            return; //If the call fails, another instance of this#onCommand() will be called anyway.
         }
 
         System.out.println(
                 colorize(
                         "Displaying all available commands:\n" +
                                 "\"auth\", \"authenticate\", \"gh\", \"git\", \"github\", \"login\", \"token\": Authenticate with Github for automatic PRs.\n" +
+                                "\"create\", \"manifest\", \"publish\", \"upload\": Creates a manifest\n" +
                                 "\"end\"; \"exit\"; \"stop\"; \"quit\": Shut down modget-create.\n" +
                                 "\"help\": This current command.\n" +
                                 "\"supported\"; \"ver\"; \"version\": Get the version of modget-create, and the supported manifest version.\n" +

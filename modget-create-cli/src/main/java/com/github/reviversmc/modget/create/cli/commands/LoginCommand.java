@@ -1,41 +1,53 @@
 package com.github.reviversmc.modget.create.cli.commands;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 
 import com.diogonunes.jcolor.Attribute;
 import com.github.reviversmc.modget.create.github.TokenManager;
+import com.github.reviversmc.modget.create.github.TokenOAuthGuider;
 
 import static com.diogonunes.jcolor.Ansi.colorize;
 
 @Named("login command")
 public class LoginCommand implements Command {
     TokenManager tokenManager;
+    TokenOAuthGuider tokenOAuthGuider;
 
     @Inject
-    public LoginCommand(TokenManager tokenManager) {
+    public LoginCommand(TokenManager tokenManager, TokenOAuthGuider tokenOAuthGuider) {
         this.tokenManager = tokenManager;
+        this.tokenOAuthGuider = tokenOAuthGuider;
     }
 
 
     @Override
-    public void onCommand(List<String> args) {
+    public void onCommand(Map<String, Optional<String>> args) {
 
         if (args.isEmpty()) {
-            tokenManager.oAuth();
+            tokenOAuthGuider.guide();
             return;
         }
-        String token = "null";
 
-        for (String arg: args) {
-            if (arg.startsWith("-t ") || arg.startsWith("--token ")) {
-                token = arg.split(" ")[0];
-            }
+        Optional<String> optionalToken = args.getOrDefault("-t", Optional.empty());
+        if (optionalToken.isEmpty())
+            optionalToken = args.getOrDefault("--token", Optional.empty());
+
+        if (optionalToken.isEmpty()) { //Should never happen.
+            System.out.println(
+                    colorize(
+                            "An unexpected error occurred!",
+                            Attribute.RED_TEXT()
+                    )
+            );
+            return;
         }
 
-        if (tokenManager.setToken(token)) {
+        if (tokenManager.setToken(optionalToken.get())) {
             System.out.println(
                     colorize(
                             "Login success!",

@@ -2,9 +2,7 @@ package com.github.reviversmc.modget.create.cli.commands;
 
 import static com.diogonunes.jcolor.Ansi.colorize;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -33,16 +31,16 @@ public class MGCCommandManager implements CommandManager {
         Command defaultCommand = null;
         String[] splitCmd = commandWithParams.split(" ");
         String commandIssued = splitCmd[0];
-        List<String> params = new ArrayList<>();
+        HashMap<String, Optional<String>> args = new HashMap<>();
 
         for (int x = 1; x < splitCmd.length; x++) {
 
             if (splitCmd[x].startsWith("-") || splitCmd[x].startsWith("--")) {
                 if (x + 1 < splitCmd.length &&
                         !splitCmd[x + 1].startsWith("-") && !splitCmd[x + 1].startsWith("--")) {
-                    params.add(splitCmd[x] + " " + splitCmd[x + 1]);
+                    args.put(splitCmd[x], Optional.of(splitCmd[x + 1]));
                 } else {
-                    params.add(splitCmd[x]);
+                    args.put(splitCmd[x], Optional.empty());
                 }
             }
         }
@@ -57,8 +55,8 @@ public class MGCCommandManager implements CommandManager {
                     for (List<String> reqParamList : command.getRequiredParameters()) {
                         boolean found = false;
 
-                        for (String param : params) {
-                            if (reqParamList.contains(param.split(" ")[0])) {
+                        for (String param : args.keySet()) {
+                            if (reqParamList.contains(param)) {
                                 found = true;
                                 break;
                             }
@@ -71,11 +69,11 @@ public class MGCCommandManager implements CommandManager {
                     }
 
 
-                    for (String param : params) {
+                    for (String param : args.keySet()) {
                         boolean recognised = false;
 
                         for (List<String> reqParamList : command.getRequiredParameters()) {
-                            if (reqParamList.contains(param.split(" ")[0])) {
+                            if (reqParamList.contains(param)) {
                                 recognised = true;
                                 break;
                             }
@@ -96,7 +94,7 @@ public class MGCCommandManager implements CommandManager {
                         }
                     }
 
-                    command.onCommand(params);
+                    command.onCommand(args);
                     return;
                 }
             }
@@ -116,6 +114,6 @@ public class MGCCommandManager implements CommandManager {
                             Attribute.RED_TEXT()
                     )
             );
-        } else defaultCommand.onCommand(List.of());
+        } else defaultCommand.onCommand(Map.of());
     }
 }

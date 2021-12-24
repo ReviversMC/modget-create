@@ -3,8 +3,7 @@ package com.github.reviversmc.modget.create.cli.commands;
 import static com.diogonunes.jcolor.Ansi.colorize;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -20,7 +19,7 @@ public class VersionCommand implements Command {
     }
 
     @Override
-    public void onCommand(List<String> args) {
+    public void onCommand(Map<String, Optional<String>> args) {
         Properties versionProperties = new Properties();
 
         try {
