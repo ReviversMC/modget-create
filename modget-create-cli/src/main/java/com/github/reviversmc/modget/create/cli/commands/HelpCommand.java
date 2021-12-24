@@ -23,9 +23,7 @@ public class HelpCommand implements Command {
 
         if (!args.isEmpty()) {
 
-            Optional<String> optionalInfo = args.getOrDefault("-i", Optional.empty());
-            if (optionalInfo.isEmpty())
-                optionalInfo = args.getOrDefault("--info", Optional.empty());
+            Optional<String> optionalInfo = ArgObtainer.obtain(args, List.of("-i", "--info"));
 
             if (optionalInfo.isEmpty()) { //Should never happen.
                 System.out.println(

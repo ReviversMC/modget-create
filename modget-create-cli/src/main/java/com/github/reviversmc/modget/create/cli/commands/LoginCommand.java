@@ -33,9 +33,7 @@ public class LoginCommand implements Command {
             return;
         }
 
-        Optional<String> optionalToken = args.getOrDefault("-t", Optional.empty());
-        if (optionalToken.isEmpty())
-            optionalToken = args.getOrDefault("--token", Optional.empty());
+        Optional<String> optionalToken = ArgObtainer.obtain(args, List.of("-t", "--token"));
 
         if (optionalToken.isEmpty()) { //Should never happen.
             System.out.println(
