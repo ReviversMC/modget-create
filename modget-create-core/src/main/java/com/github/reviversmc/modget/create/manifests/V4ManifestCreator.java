@@ -29,7 +29,6 @@ public class V4ManifestCreator implements ManifestCreator {
     private final ManifestV4 manifestV4;
     private final RepoManager repoManager;
     private final String authToken; //Allow for use of custom token.
-    private final TokenOAuthGuider tokenOAuthGuider;
     private final OkHttpClient okHttpClient;
     private final ObjectMapper yamlMapper;
 
@@ -37,9 +36,8 @@ public class V4ManifestCreator implements ManifestCreator {
     public V4ManifestCreator(
             ManifestV4 manifestV4,
             RepoManager repoManager,
-            @Assisted @Named("authToken") String authToken,
-            @Assisted @Named("modJarPath") String modJarPath,
-            TokenOAuthGuider tokenOAuthGuider,
+            @Assisted("authToken") String authToken,
+            @Assisted("modJarPath") String modJarPath,
             @Named("json") ObjectMapper jsonMapper,
             @Named("yaml") ObjectMapper yamlMapper,
             OkHttpClient okHttpClient
@@ -47,7 +45,6 @@ public class V4ManifestCreator implements ManifestCreator {
         this.manifestV4 = manifestV4;
         this.repoManager = repoManager;
         this.authToken = authToken;
-        this.tokenOAuthGuider = tokenOAuthGuider;
         this.okHttpClient = okHttpClient;
         this.yamlMapper = yamlMapper;
 
@@ -116,23 +113,6 @@ public class V4ManifestCreator implements ManifestCreator {
             for (LookupTableEntry entry : lookupTableEntries) {
                 if (modJson.getJson().get("id").equals(entry.getId())) return true;
             }
-
-            //Check for Open PRs.
-            RequestBody requestBody = RequestBody.create(
-                    GithubQuery.GET_OPEN_PRS.getQuery(),
-                    MediaType.get("application/json")
-            );
-
-            Request request = new Request.Builder()
-                    .addHeader("Accept", "application/json") //Should respond in Json anyway.
-                    .addHeader("Authorization", authToken)
-                    .post(requestBody)
-                    .url("https://api.github.com/graphql")
-                    .build();
-
-            Response response = okHttpClient.newCall(request).execute();
-
-
 
         } catch (Exception ex) {
             ex.printStackTrace();
