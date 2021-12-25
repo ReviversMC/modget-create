@@ -83,7 +83,7 @@ public class OAuthVerifyCodePojo {
     }
 
     @JsonProperty("error_description")
-    public void setError_description(String errorDescription) {
+    public void setErrorDescription(String errorDescription) {
         this.errorDescription = errorDescription;
     }
 
