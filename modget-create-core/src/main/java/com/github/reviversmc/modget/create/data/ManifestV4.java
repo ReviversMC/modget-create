@@ -4,7 +4,9 @@ import javax.inject.Inject;
 
 @SuppressWarnings("unused")
 public class ManifestV4 {
-
+    @SuppressWarnings("FieldCanBeLocal")
+    //This field is needed, so that "manifestSpecVersion" is the first to appear on the .yml file.
+    private final int manifestSpecVersion = 4;
     private String publisher;
     private String[] iconUrls;
     private String status;
@@ -20,6 +22,7 @@ public class ManifestV4 {
     private String support;
     private String wiki;
 
+    private Chats chats;
     private Version[] versions;
 
     @Inject
@@ -28,7 +31,7 @@ public class ManifestV4 {
     }
 
     public int getManifestSpecVersion() {
-        return 4;
+        return manifestSpecVersion;
     }
 
     public String getPublisher() {
@@ -135,7 +138,7 @@ public class ManifestV4 {
         this.versions = versions;
     }
 
-    private static class Author {
+    public static class Author {
         private String name;
 
         public String getName() {
@@ -147,7 +150,7 @@ public class ManifestV4 {
         }
     }
 
-    private static class Chats {
+    public static class Chats {
         private String discord;
         private String irc;
         private MiscChats[] others;
@@ -176,7 +179,7 @@ public class ManifestV4 {
             this.others = others;
         }
 
-        private static class MiscChats {
+        public static class MiscChats {
             private String name;
             private String url;
 
@@ -198,7 +201,7 @@ public class ManifestV4 {
         }
     }
 
-    private static class UpdateAlternative {
+    public static class UpdateAlternative {
         private String packageId;
 
         public String getPackageId() {
@@ -210,7 +213,7 @@ public class ManifestV4 {
         }
     }
 
-    private static class Version {
+    public static class Version {
         private String version;
 
         public String getVersion() {
