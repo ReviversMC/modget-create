@@ -59,6 +59,8 @@ public class GithubTokenManager implements TokenManager {
             String scopes = response.headers().get("X-OAuth-Scopes");
             if (scopes == null) return false;
 
+            response.close();
+
             boolean publicRepo = false;
             boolean readUser = false;
 

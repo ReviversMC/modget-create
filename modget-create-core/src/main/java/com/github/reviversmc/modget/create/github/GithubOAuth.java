@@ -55,6 +55,8 @@ public class GithubOAuth implements TokenOAuth {
                         OAuthAccessTokenPojo.class
                 );
 
+                accessTokenResponse.close();
+
                 if (accessTokenPojo.getError() != null) {
 
                     switch (accessTokenPojo.getError()) {
@@ -96,10 +98,13 @@ public class GithubOAuth implements TokenOAuth {
             Response verifyCodeResponse = okHttpClient.newCall(verifyCodeRequest).execute();
 
 
-            return jsonMapper.readValue(
+            OAuthVerifyCodePojo oAuthVerifyCodePojo = jsonMapper.readValue(
                     Objects.requireNonNull(verifyCodeResponse.body()).string(),
                     OAuthVerifyCodePojo.class
             );
+            verifyCodeResponse.close();
+            return oAuthVerifyCodePojo;
+
         } catch (IOException ex) {
             ex.printStackTrace();
             OAuthVerifyCodePojo fakeVerifyCodePojo = new OAuthVerifyCodePojo();
