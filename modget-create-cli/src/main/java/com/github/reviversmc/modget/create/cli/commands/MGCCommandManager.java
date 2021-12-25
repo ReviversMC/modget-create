@@ -85,6 +85,14 @@ public class MGCCommandManager implements CommandManager {
                         }
 
                         if (!found) {
+
+                            System.out.println(
+                                    colorize(
+                                            "You are missing some required parameters!",
+                                            Attribute.RED_TEXT()
+                                    )
+                            );
+
                             command.sendHelpMessage();
                             return;
                         }
