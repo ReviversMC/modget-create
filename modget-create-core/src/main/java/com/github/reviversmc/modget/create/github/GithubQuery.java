@@ -9,12 +9,24 @@ public enum GithubQuery {
                     "   login" +
                     "  }" +
                     "}"
+    ),
+    GET_OPEN_PRS(
+            "" + //Exists solely for readability.
+                    "query {" +
+                    "  repository(owner: \"reviversmc\", name: \"modget-manifests\") {" +
+                    "    url" +
+                    "    pullRequests(last: 100, states: OPEN) {" +
+                    "      nodes {" +
+                    "        title" +
+                    "      }" +
+                    "    }" +
+                    "  }"
     );
 
-    private String query;
+    private final String query;
 
     GithubQuery(String query) {
-
+        this.query = query;
     }
 
     public String getQuery() {
