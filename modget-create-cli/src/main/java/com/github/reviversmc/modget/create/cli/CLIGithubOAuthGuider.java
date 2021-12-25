@@ -3,7 +3,7 @@ package com.github.reviversmc.modget.create.cli;
 import com.diogonunes.jcolor.Attribute;
 import com.github.reviversmc.modget.create.github.TokenOAuth;
 import com.github.reviversmc.modget.create.github.TokenOAuthGuider;
-import com.github.reviversmc.modget.create.github.json.OAuthVerifyCodePojo;
+import com.github.reviversmc.modget.create.data.OAuthVerifyCodePojo;
 
 import javax.inject.Inject;
 

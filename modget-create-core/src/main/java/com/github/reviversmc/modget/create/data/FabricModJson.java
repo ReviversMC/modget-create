@@ -1,4 +1,4 @@
-package com.github.reviversmc.modget.create.manifests.data;
+package com.github.reviversmc.modget.create.data;
 
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;

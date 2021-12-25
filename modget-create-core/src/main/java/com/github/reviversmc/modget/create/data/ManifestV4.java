@@ -1,4 +1,6 @@
-package com.github.reviversmc.modget.create.manifests.data;
+package com.github.reviversmc.modget.create.data;
+
+import javax.inject.Inject;
 
 @SuppressWarnings("unused")
 public class ManifestV4 {
@@ -19,6 +21,11 @@ public class ManifestV4 {
     private String wiki;
 
     private Version[] versions;
+
+    @Inject
+    public ManifestV4() {
+
+    }
 
     public int getManifestSpecVersion() {
         return 4;

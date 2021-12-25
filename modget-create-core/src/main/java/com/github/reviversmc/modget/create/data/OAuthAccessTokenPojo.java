@@ -1,4 +1,4 @@
-package com.github.reviversmc.modget.create.github.json;
+package com.github.reviversmc.modget.create.data;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

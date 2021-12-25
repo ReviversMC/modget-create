@@ -1,6 +1,6 @@
 package com.github.reviversmc.modget.create.github;
 
-import com.github.reviversmc.modget.create.github.json.OAuthVerifyCodePojo;
+import com.github.reviversmc.modget.create.data.OAuthVerifyCodePojo;
 
 import java.io.IOException;
 

@@ -1,8 +1,8 @@
 package com.github.reviversmc.modget.create.github;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.reviversmc.modget.create.github.json.OAuthAccessTokenPojo;
-import com.github.reviversmc.modget.create.github.json.OAuthVerifyCodePojo;
+import com.github.reviversmc.modget.create.data.OAuthAccessTokenPojo;
+import com.github.reviversmc.modget.create.data.OAuthVerifyCodePojo;
 import okhttp3.*;
 
 import javax.inject.Inject;
