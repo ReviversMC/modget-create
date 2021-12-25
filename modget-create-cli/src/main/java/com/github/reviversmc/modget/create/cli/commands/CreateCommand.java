@@ -53,31 +53,6 @@ public class CreateCommand implements Command {
             return;
         }
 
-        ManifestCreator manifestCreator = manifestCreatorFactory.create(optionalJarPath.get());
-
-        if (!manifestCreator.isUsable()) {
-            System.out.println(
-                    colorize(
-                            "You did not specify a valid Fabric mod using \"-j <path-to-mod>\" " +
-                                    "or \"--jar <path-to-mod>\"!",
-                            Attribute.RED_TEXT()
-                    )
-            );
-            return;
-        }
-
-        if (manifestCreator.isModPresent()) {
-            System.out.println(
-                    colorize(
-                            "Thanks for wanting to contribute, but the manifest for this mod already exists," +
-                                    " or is currently being PR-ed by someone else!\n" +
-                                    "Cancelling operation...",
-                            Attribute.YELLOW_TEXT()
-                    )
-            );
-            return;
-        }
-
         //Start search for optional args
         Optional<String> optionalOutputFolder = ArgObtainer.obtain(args, List.of("-o", "--output"));
         File outputFolder;
@@ -129,8 +104,33 @@ public class CreateCommand implements Command {
             }
         }
 
+        ManifestCreator manifestCreator = manifestCreatorFactory.create(token, optionalJarPath.get());
+
+        if (!manifestCreator.isUsable()) {
+            System.out.println(
+                    colorize(
+                            "You did not specify a valid Fabric mod using \"-j <path-to-mod>\" " +
+                                    "or \"--jar <path-to-mod>\"!",
+                            Attribute.RED_TEXT()
+                    )
+            );
+            return;
+        }
+
+        if (manifestCreator.isModPresent()) {
+            System.out.println(
+                    colorize(
+                            "Thanks for wanting to contribute, but the manifest for this mod already exists," +
+                                    " or is currently being PR-ed by someone else!\n" +
+                                    "Cancelling operation...",
+                            Attribute.YELLOW_TEXT()
+                    )
+            );
+            return;
+        }
+
         Optional<InputStream> optionalManifestYamlInputStream = manifestCreator.createYaml(
-                optionalModrinthId.get(), optionalCurseforgeId.get(), token
+                optionalModrinthId.get(), optionalCurseforgeId.get()
         );
     }
 
