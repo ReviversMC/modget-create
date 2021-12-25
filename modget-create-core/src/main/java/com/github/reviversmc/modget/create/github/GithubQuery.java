@@ -15,7 +15,8 @@ public enum GithubQuery {
                     "query {" +
                     "  repository(owner: \"reviversmc\", name: \"modget-manifests\") {" +
                     "    url" +
-                    "    pullRequests(last: 100, states: OPEN) {" +
+                    //Previous PR probably out-of-date and needs a bump if past 200.
+                    "    pullRequests(first: 200, states: OPEN) {" +
                     "      nodes {" +
                     "        title" +
                     "      }" +
