@@ -70,6 +70,12 @@ public class MGCCommandManager implements CommandManager {
                         boolean found = false;
 
                         for (String param : args.keySet()) {
+
+                            if (param.equals("-h") || param.equals("--help")) { //Intercept before error is given.
+                                command.sendHelpMessage();
+                                return;
+                            }
+
                             if (reqParamList.contains(param) &&
                                     //Protect against required params with no value
                                     args.getOrDefault(param, Optional.empty()).isPresent()) {

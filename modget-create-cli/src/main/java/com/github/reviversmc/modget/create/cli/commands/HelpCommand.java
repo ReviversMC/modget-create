@@ -11,7 +11,6 @@ import javax.inject.Inject;
 import com.diogonunes.jcolor.Attribute;
 
 public class HelpCommand implements Command {
-    private CommandManager commandManager;
 
     @Inject
     public HelpCommand() {
@@ -20,31 +19,6 @@ public class HelpCommand implements Command {
 
     @Override
     public void onCommand(Map<String, Optional<String>> args) {
-
-        if (!args.isEmpty()) {
-
-            Optional<String> optionalInfo = ArgObtainer.obtain(args, List.of("-i", "--info"));
-
-            if (optionalInfo.isEmpty()) { //Should never happen.
-                System.out.println(
-                        colorize(
-                                "An unexpected error occurred!",
-                                Attribute.RED_TEXT()
-                        )
-                );
-                return;
-            }
-
-            if (commandManager == null)
-                commandManager = DaggerCommandManagerComponent.create().getCommandManager();
-
-            commandManager.callCommand(
-                    optionalInfo.get() + " --help"
-            );
-
-            return; //If the call fails, another instance of this#onCommand() will be called anyway.
-        }
-
         System.out.println(
                 colorize(
                         "Displaying all available commands:\n" +
@@ -57,8 +31,6 @@ public class HelpCommand implements Command {
                         Attribute.GREEN_TEXT()
                 )
         );
-
-
     }
 
     @Override
@@ -68,13 +40,6 @@ public class HelpCommand implements Command {
 
     @Override
     public String getDescription() {
-        return "This command lists the usage of all available commands.\n" +
-                "Parameters definitions:\n" +
-                "-i <command>, --info <command>: Get more information on a command, as specified in <command>.";
-    }
-
-    @Override
-    public List<String> getOptionalParameters() {
-        return List.of("-i", "--info");
+        return "This command lists the usage of all available commands.\n";
     }
 }
