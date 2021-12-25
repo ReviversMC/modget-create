@@ -1,16 +1,11 @@
 package com.github.reviversmc.modget.create.github;
 
-import static com.diogonunes.jcolor.Ansi.colorize;
 
 import java.io.IOException;
 import java.util.Optional;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 import javax.inject.Singleton;
-
-import com.diogonunes.jcolor.Attribute;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;

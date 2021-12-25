@@ -1,10 +1,9 @@
 package com.github.reviversmc.modget.create.manifests;
 
+import dagger.assisted.Assisted;
 import dagger.assisted.AssistedFactory;
-
-import javax.inject.Named;
 
 @AssistedFactory
 public interface ManifestCreatorFactory {
-    V4ManifestCreator create(@Named("authToken") String authToken, @Named("modJarPath") String modJarPath);
+    V4ManifestCreator create(@Assisted("authToken") String authToken, @Assisted("modJarPath") String modJarPath);
 }
