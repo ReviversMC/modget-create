@@ -10,4 +10,7 @@ public interface TokenManagerModule {
     @Binds
     @Singleton
     TokenManager githubTokenManager(GithubTokenManager tokenManager);
+
+    @Binds
+    TokenOAuth githubOAuth(GithubOAuth githubOAuth);
 }
