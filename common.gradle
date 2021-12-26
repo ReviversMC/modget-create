@@ -44,8 +44,9 @@ dependencies {
     // include implementation(files("../libs/modget-lib-${project.modget_lib_version}.jar"))
 
     shadow implementation("org.apache.commons:commons-text:${project.commons_text_version}")
-    shadow implementation ('org.apache.logging.log4j:log4j-core:2.16.0')
+    shadow implementation('org.apache.logging.log4j:log4j-core:2.16.0')
     shadow implementation("com.diogonunes:JColor:5.2.0")
+    shadow implementation("com.github.TheRandomLabs:CurseAPI:master-SNAPSHOT")
     shadow implementation("com.google.dagger:dagger:2.40.5")
     shadow implementation("com.squareup.okhttp3:okhttp:4.9.3")
     shadow implementation("com.squareup.okhttp3:okhttp-urlconnection:4.9.3")
