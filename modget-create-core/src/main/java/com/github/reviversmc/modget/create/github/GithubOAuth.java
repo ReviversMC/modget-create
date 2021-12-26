@@ -97,7 +97,6 @@ public class GithubOAuth implements TokenOAuth {
         try {
             Response verifyCodeResponse = okHttpClient.newCall(verifyCodeRequest).execute();
 
-
             OAuthVerifyCodePojo oAuthVerifyCodePojo = jsonMapper.readValue(
                     Objects.requireNonNull(verifyCodeResponse.body()).string(),
                     OAuthVerifyCodePojo.class
