@@ -1,26 +1,22 @@
 package com.github.reviversmc.modget.create.github;
 
 
-import java.io.IOException;
 import java.util.Optional;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import okhttp3.MediaType;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
+import com.github.reviversmc.modget.create.apicalls.GithubQueryFactory;
 
 @Singleton
 public class GithubTokenManager implements TokenManager {
-    private final OkHttpClient okHttpClient;
+
+    private final GithubQueryFactory githubQueryFactory;
     private String githubToken;
 
     @Inject
-    public GithubTokenManager(OkHttpClient okHttpClient) {
-        this.okHttpClient = okHttpClient;
+    public GithubTokenManager(GithubQueryFactory githubQueryFactory) {
+        this.githubQueryFactory = githubQueryFactory;
     }
 
     @Override
@@ -40,39 +36,19 @@ public class GithubTokenManager implements TokenManager {
 
     @Override
     public boolean validateToken(String token) {
-        //Start by checking the scope.
-        RequestBody requestBody = RequestBody.create(
-                GithubQuery.CONFIRM_LOGIN.getQuery(),
-                MediaType.get("application/json")
-        );
 
-        Request request = new Request.Builder()
-                .addHeader("Authorization", "Bearer " + token)
-                .post(requestBody)
-                .url("https://api.github.com/graphql")
-                .build();
 
-        try {
+        String scopes = githubQueryFactory.create(token).getScopes();
+        if (scopes == null) return false;
 
-            Response response = okHttpClient.newCall(request).execute();
+        boolean publicRepo = false;
+        boolean readUser = false;
 
-            String scopes = response.headers().get("X-OAuth-Scopes");
-            if (scopes == null) return false;
-
-            response.close();
-
-            boolean publicRepo = false;
-            boolean readUser = false;
-
-            for (String scope : scopes.split(", ")) {
-                if (scope.equals("public_repo")) publicRepo = true;
-                if (scope.equals("read:user")) readUser = true;
-            }
-
-            return publicRepo && readUser;
-        } catch (IOException ex) {
-            ex.printStackTrace();
+        for (String scope : scopes.split(", ")) {
+            if (scope.equals("public_repo")) publicRepo = true;
+            if (scope.equals("read:user")) readUser = true;
         }
-        return false;
+
+        return publicRepo && readUser;
     }
 }
