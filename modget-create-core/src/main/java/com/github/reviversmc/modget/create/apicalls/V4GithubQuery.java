@@ -1,6 +1,7 @@
 package com.github.reviversmc.modget.create.apicalls;
 
 import dagger.assisted.Assisted;
+import dagger.assisted.AssistedInject;
 import okhttp3.*;
 
 import javax.inject.Inject;
@@ -11,7 +12,7 @@ public class V4GithubQuery implements GithubQuery {
     private final OkHttpClient okHttpClient;
     private final String authToken;
 
-    @Inject
+    @AssistedInject
     public V4GithubQuery(OkHttpClient okHttpClient, @Assisted String authToken) {
         this.okHttpClient = okHttpClient;
         this.authToken = authToken;
