@@ -6,6 +6,7 @@ import javax.inject.Singleton;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
 import dagger.Module;
 import dagger.Provides;
 import okhttp3.OkHttpClient;
@@ -30,6 +31,7 @@ public interface DependencyModule {
     @Provides
     @Singleton
     static ObjectMapper yamlMapper() {
-        return new ObjectMapper(new YAMLFactory());
+        return new ObjectMapper(new YAMLFactory()
+                .disable(YAMLGenerator.Feature.WRITE_DOC_START_MARKER));
     }
 }
