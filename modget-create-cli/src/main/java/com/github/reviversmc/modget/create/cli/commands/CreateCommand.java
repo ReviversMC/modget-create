@@ -37,10 +37,10 @@ public class CreateCommand implements Command {
     public void onCommand(Map<String, Optional<String>> args) {
 
         //CF id, manifest creator, and MR id will definitely have a value, as they are mandatory values.
-        Optional<String> optionalCurseforgeId = ArgObtainer.obtain(args, List.of("-cf", "--curseforge"));
-        Optional<String> optionalModrinthId = ArgObtainer.obtain(args, List.of("-mr", "--modrinth"));
-        Optional<String> optionalJarPath = ArgObtainer.obtain(args, List.of("-j", "--jar"));
-        Optional<String> optionalStatus = ArgObtainer.obtain(args, List.of("-s", "--status"));
+        Optional<String> optionalCurseforgeId = ArgObtainer.obtainFirst(args, List.of("-cf", "--curseforge"));
+        Optional<String> optionalModrinthId = ArgObtainer.obtainFirst(args, List.of("-mr", "--modrinth"));
+        Optional<String> optionalJarPath = ArgObtainer.obtainFirst(args, List.of("-j", "-jar", "--jar"));
+        Optional<String> optionalStatus = ArgObtainer.obtainFirst(args, List.of("-s", "--status"));
 
         if (optionalCurseforgeId.isEmpty() ||
                 optionalModrinthId.isEmpty() ||
@@ -59,11 +59,12 @@ public class CreateCommand implements Command {
 
 
         try {
-            ModStatus modStatus = ModStatus.valueOf(optionalStatus.get());
+            ModStatus modStatus = ModStatus.valueOf(optionalStatus.get().toUpperCase());
+
 
 
             //Start search for optional args
-            Optional<String> optionalOutputFolder = ArgObtainer.obtain(args, List.of("-o", "--output"));
+            Optional<String> optionalOutputFolder = ArgObtainer.obtainFirst(args, List.of("-o", "--output"));
             File outputFolder;
 
             if (optionalOutputFolder.isPresent()) {
@@ -81,7 +82,7 @@ public class CreateCommand implements Command {
                 }
             }
 
-            Optional<String> optionalToken = ArgObtainer.obtain(args, List.of("-t", "--token"));
+            Optional<String> optionalToken = ArgObtainer.obtainFirst(args, List.of("-t", "--token"));
             String token;
 
             if (optionalToken.isPresent()) {
@@ -112,6 +113,10 @@ public class CreateCommand implements Command {
                     return;
                 }
             }
+
+            Optional<List<String>> optionalUpdateAlternatives = ArgObtainer.obtainAll(
+                    args, List.of("-ua", "--update-alternatives")
+            );
 
             ManifestCreator manifestCreator = manifestCreatorFactory.create(token, optionalJarPath.get());
 
@@ -145,7 +150,7 @@ public class CreateCommand implements Command {
         } catch (IllegalArgumentException ex) {
             System.out.println(
                     colorize(
-                            "You provided an invalid mod status! (argument -s/--status)" +
+                            "You provided an invalid mod status! (argument -s/--status) " +
                                     "Please specify \"ABANDONED\", \"ACTIVE\", \"EOL\", or \"UNKNOWN\".",
                             Attribute.RED_TEXT()
                     )
@@ -165,14 +170,14 @@ public class CreateCommand implements Command {
 
     @Override
     public List<String> getOptionalParameters() {
-        return List.of("-o", "--output", "-t", "--token");
+        return List.of("-o", "--output", "-t", "--token", "-ua", "--update-alternatives");
     }
 
     @Override
     public List<List<String>> getRequiredParameters() {
         return List.of(
                 List.of("-cf", "--curseforge"),
-                List.of("-j", "--jar"),
+                List.of("-j", "-jar", "--jar"),
                 List.of("-mr", "--modrinth"),
                 List.of("-s", "--status")
         );
