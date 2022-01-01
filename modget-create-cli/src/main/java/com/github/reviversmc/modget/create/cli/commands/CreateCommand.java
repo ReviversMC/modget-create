@@ -120,6 +120,7 @@ public class CreateCommand implements Command {
 
             ManifestCreator manifestCreator = manifestCreatorFactory.create(
                     optionalUpdateAlternatives.orElseGet(List::of),
+                    modStatus,
                     token,
                     optionalCurseforgeId.get(),
                     optionalModrinthId.get(),

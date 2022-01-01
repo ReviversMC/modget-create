@@ -27,6 +27,7 @@ import java.util.Optional;
 
 public class V4ManifestCreator implements ManifestCreator {
     private final FabricModPojo modPojo;
+    private final List<String> updateAlternatives;
     private final ManifestV4 manifestV4;
     private final ModStatus modStatus;
     private final RepoManager repoManager;
@@ -38,17 +39,19 @@ public class V4ManifestCreator implements ManifestCreator {
 
     @AssistedInject
     public V4ManifestCreator(
+            @Assisted List<String> updateAlternatives,
             ManifestV4 manifestV4,
-            ModStatus modStatus,
+            @Assisted ModStatus modStatus,
             RepoManager repoManager,
             @Assisted("authToken") String authToken,
             @Assisted("curseId") String curseforgeId,
             @Assisted("modJarPath") String modJarPath,
-            @Assisted("modrinthID") String modrinthId,
+            @Assisted("modrinthId") String modrinthId,
             @Named("json") ObjectMapper jsonMapper,
             @Named("yaml") ObjectMapper yamlMapper,
             OkHttpClient okHttpClient
     ) {
+        this.updateAlternatives = updateAlternatives;
         this.manifestV4 = manifestV4;
         this.modStatus = modStatus;
         this.repoManager = repoManager;
