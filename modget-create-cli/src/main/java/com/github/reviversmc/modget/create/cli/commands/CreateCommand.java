@@ -9,7 +9,7 @@ import com.github.reviversmc.modget.create.manifests.ManifestCreatorFactory;
 
 import javax.inject.Inject;
 import java.io.File;
-import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -118,7 +118,13 @@ public class CreateCommand implements Command {
                     args, List.of("-ua", "--update-alternatives")
             );
 
-            ManifestCreator manifestCreator = manifestCreatorFactory.create(token, optionalJarPath.get());
+            ManifestCreator manifestCreator = manifestCreatorFactory.create(
+                    optionalUpdateAlternatives.orElseGet(List::of),
+                    token,
+                    optionalCurseforgeId.get(),
+                    optionalModrinthId.get(),
+                    optionalJarPath.get()
+            );
 
             if (!manifestCreator.isUsable()) {
                 System.out.println(
@@ -143,9 +149,7 @@ public class CreateCommand implements Command {
                 return;
             }
 
-            Optional<InputStream> optionalManifestYamlInputStream = manifestCreator.createYaml(
-                    optionalModrinthId.get(), optionalCurseforgeId.get(), modStatus
-            );
+            Optional<OutputStream> optionalManifestYamlInputStream = manifestCreator.createMainYaml();
 
         } catch (IllegalArgumentException ex) {
             System.out.println(
