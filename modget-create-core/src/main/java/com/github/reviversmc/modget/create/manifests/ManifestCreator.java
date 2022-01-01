@@ -1,14 +1,24 @@
 package com.github.reviversmc.modget.create.manifests;
-
-import com.github.reviversmc.modget.create.data.ModStatus;
-
-import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Optional;
 
 public interface ManifestCreator {
-    //TODO(Add javadoc annotations)
 
+    /**
+     * Checks if the mod is already present.
+     * @return True if the mod is present, false otherwise. False will be given for errors as well.
+     */
     boolean isModPresent();
-    Optional<InputStream> createYaml(String modrinthId, String curseforgeId, ModStatus modStatus);
+
+    /**
+     * Creates the main.yml for a mod.
+     * @return An {@link Optional<OutputStream>} of the yaml if successful, {@link Optional#empty()} otherwise.
+     */
+    Optional<OutputStream> createMainYaml();
+
+    /**
+     * Checks if the mod to create the manifest for is valid.
+     * @return True if it is a valid Fabric mod, false otherwise.
+     */
     boolean isUsable();
 }
