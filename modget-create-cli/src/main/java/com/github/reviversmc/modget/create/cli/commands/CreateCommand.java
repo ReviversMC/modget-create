@@ -91,7 +91,7 @@ public class CreateCommand implements Command {
                     System.out.println(
                             colorize(
                                     "Your GitHub token is invalid! Please ensure that it has the " +
-                                            "\"read:user\", and the \"public_repo\" scope.",
+                                            "\"public_repo\" scope.",
                                     Attribute.RED_TEXT()
                             )
                     );

@@ -41,14 +41,9 @@ public class GithubTokenManager implements TokenManager {
         String scopes = githubQueryFactory.create(token).getScopes();
         if (scopes == null) return false;
 
-        boolean publicRepo = false;
-        boolean readUser = false;
-
         for (String scope : scopes.split(", ")) {
-            if (scope.equals("public_repo")) publicRepo = true;
-            if (scope.equals("read:user")) readUser = true;
+            if (scope.equals("public_repo")) return true;
         }
-
-        return publicRepo && readUser;
+        return false;
     }
 }

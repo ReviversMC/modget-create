@@ -85,7 +85,7 @@ public class GithubOAuth implements TokenOAuth {
     public OAuthVerifyCodePojo getOAuthVerifyCode() {
         RequestBody verifyCodeRequestBody = new FormBody.Builder()
                 .add("client_id", clientId)
-                .add("scope", "read:user, public_repo")
+                .add("scope", "public_repo")
                 .build();
 
         Request verifyCodeRequest = new Request.Builder()
