@@ -16,13 +16,6 @@ public class FabricModPojo {
 
     private Contact contact;
 
-    /*
-    This is a huge dumping group for all values, as there can be so many dynamic values.
-    Should never actually be used to get values!
-     */
-    @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
-    private final Map<String, Object> json = new HashMap<>();
-
     public FabricModPojo() {
 
     }
@@ -75,9 +68,13 @@ public class FabricModPojo {
         this.contact = contact;
     }
 
+    /*
+    This is a huge dumping group for all values, as there can be so many dynamic values.
+    Should never actually be used to get values!
+    */
     @JsonAnySetter
     public void addJson(String key, Object value) {
-        json.put(key, value);
+        //Purposefully empty.
     }
 
     public static class Contact {
@@ -108,6 +105,15 @@ public class FabricModPojo {
 
         public void setIssues(String issues) {
             this.issues = issues;
+        }
+
+        /*
+        This is a huge dumping group for all values, as there can be so many dynamic values.
+        Should never actually be used to get values!
+        */
+        @JsonAnySetter
+        public void addJson(String key, Object value) {
+            //Purposefully empty.
         }
     }
 }

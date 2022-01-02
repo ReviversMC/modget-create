@@ -58,8 +58,8 @@ public class ManifestV4MainPojo {
         this.status = status;
     }
 
-    public UpdateAlternative[] getUpdateAlternatives() {
-        return updateAlternatives;
+    public Object getUpdateAlternatives() {
+        return updateAlternatives.length == 0 ? "~" : updateAlternatives;
     }
 
     public void setUpdateAlternatives(UpdateAlternative[] updateAlternatives) {
