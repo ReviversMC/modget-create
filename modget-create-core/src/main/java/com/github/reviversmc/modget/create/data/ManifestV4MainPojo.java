@@ -3,7 +3,7 @@ package com.github.reviversmc.modget.create.data;
 import javax.inject.Inject;
 
 @SuppressWarnings("unused")
-public class ManifestV4Pojo {
+public class ManifestV4MainPojo {
     @SuppressWarnings("FieldCanBeLocal")
     //This field is needed, so that "manifestSpecVersion" is the first to appear on the .yml file.
     private final int manifestSpecVersion = 4;
@@ -26,7 +26,7 @@ public class ManifestV4Pojo {
     private Version[] versions;
 
     @Inject
-    public ManifestV4Pojo() {
+    public ManifestV4MainPojo() {
 
     }
 
