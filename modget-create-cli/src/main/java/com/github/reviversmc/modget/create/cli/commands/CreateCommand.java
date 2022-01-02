@@ -8,8 +8,8 @@ import com.github.reviversmc.modget.create.manifests.ManifestCreator;
 import com.github.reviversmc.modget.create.manifests.ManifestCreatorFactory;
 
 import javax.inject.Inject;
-import java.io.File;
-import java.io.OutputStream;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -63,7 +63,7 @@ public class CreateCommand implements Command {
 
             //Start search for optional args
             Optional<String> optionalOutputFolder = ArgObtainer.obtainFirst(args, List.of("-o", "--output"));
-            File outputFolder;
+            File outputFolder = null;
 
             if (optionalOutputFolder.isPresent()) {
                 outputFolder = new File(optionalOutputFolder.get());
@@ -96,7 +96,11 @@ public class CreateCommand implements Command {
                 }
             } else {
                 optionalToken = tokenManager.getToken();
-                if (optionalToken.isEmpty()) tokenOAuthGuider.guide();
+                if (optionalToken.isEmpty()) {
+                    tokenOAuthGuider.guide();
+                    optionalToken = tokenManager.getToken();
+                }
+
                 if (optionalToken.isPresent()) token = optionalToken.get();
                 else { //User rejected oAuth.
                     //No token, which is required.
@@ -121,8 +125,8 @@ public class CreateCommand implements Command {
                     modStatus,
                     token,
                     optionalCurseforgeId.get(),
-                    optionalModrinthId.get(),
-                    optionalJarPath.get()
+                    optionalJarPath.get(),
+                    optionalModrinthId.get()
             );
 
             if (!manifestCreator.isUsable()) {
@@ -148,7 +152,23 @@ public class CreateCommand implements Command {
                 return;
             }
 
-            Optional<OutputStream> optionalManifestYamlInputStream = manifestCreator.createMainYaml();
+            Optional<String> optionalMainManifest = manifestCreator.createMainYaml();
+
+            if (optionalMainManifest.isEmpty()) {
+                colorize(
+                        "Something went wrong! Please try again",
+                        Attribute.RED_TEXT()
+                );
+                return;
+            }
+
+            if (optionalOutputFolder.isPresent()) {
+                FileOutputStream mainYmlStream = new FileOutputStream(
+                        outputFolder.getAbsolutePath() + File.separator + "main.yml"
+                );
+                mainYmlStream.write(optionalMainManifest.get().getBytes(StandardCharsets.UTF_8));
+                mainYmlStream.close();
+            }
 
         } catch (IllegalArgumentException ex) {
             System.out.println(
@@ -158,6 +178,8 @@ public class CreateCommand implements Command {
                             Attribute.RED_TEXT()
                     )
             );
+        } catch (IOException ex) {
+            ex.printStackTrace();
         }
     }
 
