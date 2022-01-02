@@ -6,7 +6,6 @@ import com.github.reviversmc.modget.create.apicalls.ModrinthQueryFactory;
 import com.github.reviversmc.modget.create.data.FabricModPojo;
 import com.github.reviversmc.modget.create.data.ManifestV4MainPojo;
 import com.github.reviversmc.modget.create.data.ModStatus;
-import com.github.reviversmc.modget.create.data.ModrinthV1ModPojo;
 import com.github.reviversmc.modget.library.manager.RepoManager;
 import com.github.reviversmc.modget.manifests.spec4.api.data.manifest.main.ModAuthor;
 import com.github.reviversmc.modget.manifests.spec4.api.data.manifest.main.ModManifest;
@@ -22,10 +21,7 @@ import dagger.assisted.AssistedInject;
 import okhttp3.*;
 
 import javax.inject.Named;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
@@ -79,10 +75,17 @@ public class V4ManifestCreator implements ManifestCreator {
         this.okHttpClient = okHttpClient;
         this.yamlMapper = yamlMapper;
 
+        if (modJarPath.startsWith("\"") || modJarPath.startsWith("'")) {
+            modJarPath = modJarPath.substring(1);
+        }
+
+        if (modJarPath.endsWith("\"") || modJarPath.endsWith("'")) {
+            modJarPath = modJarPath.substring(0, modJarPath.length() - 1);
+        }
+
         File mod = new File(modJarPath);
         FabricModPojo tempModPojo = null;
         if (mod.exists() && modJarPath.toLowerCase().endsWith(".jar")) {
-
             try {
                 URLClassLoader classLoader = new URLClassLoader(new URL[]{mod.toURI().toURL()});
                 InputStream modJsonStream = classLoader.getResourceAsStream("fabric.mod.json");
@@ -101,7 +104,7 @@ public class V4ManifestCreator implements ManifestCreator {
     }
 
     @Override
-    public Optional<OutputStream> createMainYaml() {
+    public Optional<String> createMainYaml() {
 
         if (!isUsable() || isModPresent()) return Optional.empty();
 
@@ -122,7 +125,6 @@ public class V4ManifestCreator implements ManifestCreator {
 
 
         boolean modrinthFound = modrinthQuery.modExists();
-        ModrinthV1ModPojo modrinthV1ModPojo = modrinthQuery.getMod();
 
         //Set publisher
         if (githubFound) {
@@ -131,10 +133,10 @@ public class V4ManifestCreator implements ManifestCreator {
 
 
             //noinspection HttpUrlsUsage
-            if (githubPage.toLowerCase().startsWith("http://"))
-                manifestV4MainPojo.setPublisher(githubPage.substring(7).split("/")[0]);
+            if (githubPage.toLowerCase().startsWith("http://github.com/"))
+                manifestV4MainPojo.setPublisher(githubPage.substring(18).split("/")[0]);
 
-            else manifestV4MainPojo.setPublisher(githubPage.substring(8).split("/")[0]);
+            else manifestV4MainPojo.setPublisher(githubPage.substring(19).split("/")[0]);
 
         } else if (curseforgeFound)
             manifestV4MainPojo.setPublisher(optionalCurseProject.get().author().name());
@@ -149,7 +151,7 @@ public class V4ManifestCreator implements ManifestCreator {
         List<String> iconUrls = new ArrayList<>();
 
         if (modrinthFound)
-            modrinthV1ModPojo.getIconUrl().ifPresent(iconUrls::add);
+            modrinthQuery.getMod().getIconUrl().ifPresent(iconUrls::add);
 
         if (curseforgeFound) {
             HttpUrl iconUrl = optionalCurseProject.get().logo().url();
@@ -157,8 +159,10 @@ public class V4ManifestCreator implements ManifestCreator {
         }
 
         if (githubFound) {
-
+            //TODO Use api calls to check for an icon.
         }
+
+        manifestV4MainPojo.setIconUrls(iconUrls.toArray(new String[0]));
 
         manifestV4MainPojo.setStatus(modStatus.name().toLowerCase());
 
@@ -169,7 +173,9 @@ public class V4ManifestCreator implements ManifestCreator {
             updateAlternativeList.add(updateAlternative);
         }
 
-        manifestV4MainPojo.setUpdateAlternatives(updateAlternativeList.toArray(new ManifestV4MainPojo.UpdateAlternative[0]));
+        manifestV4MainPojo.setUpdateAlternatives(
+                updateAlternativeList.toArray(new ManifestV4MainPojo.UpdateAlternative[0])
+        );
 
         manifestV4MainPojo.setName(modPojo.getName());
         manifestV4MainPojo.setDescription(modPojo.getDescription());
@@ -203,7 +209,11 @@ public class V4ManifestCreator implements ManifestCreator {
         //TODO Set versions from CF/Modrinth.
         manifestV4MainPojo.setVersions(null);
 
-
+        try {
+            return Optional.of(yamlMapper.writeValueAsString(manifestV4MainPojo));
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
         return Optional.empty();
     }
 

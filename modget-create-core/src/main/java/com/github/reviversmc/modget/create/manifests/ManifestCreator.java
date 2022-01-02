@@ -14,7 +14,7 @@ public interface ManifestCreator {
      * Creates the main.yml for a mod.
      * @return An {@link Optional<OutputStream>} of the yaml if successful, {@link Optional#empty()} otherwise.
      */
-    Optional<OutputStream> createMainYaml();
+    Optional<String> createMainYaml();
 
     /**
      * Checks if the mod to create the manifest for is valid.
