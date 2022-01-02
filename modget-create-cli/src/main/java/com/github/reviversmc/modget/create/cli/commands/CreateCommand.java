@@ -61,8 +61,6 @@ public class CreateCommand implements Command {
         try {
             ModStatus modStatus = ModStatus.valueOf(optionalStatus.get().toUpperCase());
 
-
-
             //Start search for optional args
             Optional<String> optionalOutputFolder = ArgObtainer.obtainFirst(args, List.of("-o", "--output"));
             File outputFolder;
@@ -74,7 +72,7 @@ public class CreateCommand implements Command {
                     System.out.println(
                             colorize(
                                     "The provided output directory is invalid!\n" +
-                                            "If you meant to let modget-create do a PR for you, don't specify an output directory!",
+                                            "If you meant to let modget-create do a PR for you, don't specify an output directory! (-o/--output)",
                                     Attribute.RED_TEXT()
                             )
                     );
@@ -104,7 +102,7 @@ public class CreateCommand implements Command {
                     //No token, which is required.
                     System.out.println(
                             colorize(
-                                    "You have no output directory or valid GitHub token!" +
+                                    "You have no valid GitHub token!" +
                                             "Please try again with a GitHub token, " +
                                             "or approve the authentication code when you are presented with it.",
                                     Attribute.RED_TEXT()
