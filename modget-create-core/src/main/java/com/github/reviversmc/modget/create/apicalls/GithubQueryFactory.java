@@ -4,5 +4,5 @@ import dagger.assisted.AssistedFactory;
 
 @AssistedFactory
 public interface GithubQueryFactory {
-    V4GithubQuery create(String authToken);
+    GithubV4Query create(String authToken);
 }

@@ -4,16 +4,15 @@ import dagger.assisted.Assisted;
 import dagger.assisted.AssistedInject;
 import okhttp3.*;
 
-import javax.inject.Inject;
 import java.io.IOException;
 
-public class V4GithubQuery implements GithubQuery {
+public class GithubV4Query implements GithubQuery {
 
     private final OkHttpClient okHttpClient;
     private final String authToken;
 
     @AssistedInject
-    public V4GithubQuery(OkHttpClient okHttpClient, @Assisted String authToken) {
+    public GithubV4Query(OkHttpClient okHttpClient, @Assisted String authToken) {
         this.okHttpClient = okHttpClient;
         this.authToken = authToken;
     }
