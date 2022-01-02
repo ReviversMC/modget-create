@@ -1,6 +1,5 @@
 package com.github.reviversmc.modget.create.data;
 
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 
 import java.util.HashMap;
@@ -15,7 +14,13 @@ public class FabricModPojo {
     private String id;
     private String version;
 
-    //this.json is a huge dumping group for all values, as there can be so many dynamic values.
+    private Contact contact;
+
+    /*
+    This is a huge dumping group for all values, as there can be so many dynamic values.
+    Should never actually be used to get values!
+     */
+    @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
     private final Map<String, Object> json = new HashMap<>();
 
     public FabricModPojo() {
@@ -62,13 +67,47 @@ public class FabricModPojo {
         this.version = version;
     }
 
+    public Contact getContact() {
+        return contact;
+    }
+
+    public void setContact(Contact contact) {
+        this.contact = contact;
+    }
+
     @JsonAnySetter
     public void addJson(String key, Object value) {
         json.put(key, value);
     }
 
-    @JsonAnyGetter
-    public Map<String, Object> getJson() {
-        return json;
+    public static class Contact {
+
+        private String homepage = "~";
+        private String sources = "~";
+        private String issues = "~";
+
+        public String getHomepage() {
+            return homepage;
+        }
+
+        public void setHomepage(String homepage) {
+            this.homepage = homepage;
+        }
+
+        public String getSources() {
+            return sources;
+        }
+
+        public void setSources(String sources) {
+            this.sources = sources;
+        }
+
+        public String getIssues() {
+            return issues;
+        }
+
+        public void setIssues(String issues) {
+            this.issues = issues;
+        }
     }
 }
