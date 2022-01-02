@@ -120,9 +120,13 @@ public class ModrinthV1Query implements ModrinthQuery {
             ResponseBody responseBody = response.body();
 
             if (responseBody != null) {
-                response.close();
-                return true;
+                if (!responseBody.string().equals("")) {
+                    response.close();
+                    return true;
+                }
             }
+
+            response.close();
 
         } catch (IOException ex) {
             ex.printStackTrace();
