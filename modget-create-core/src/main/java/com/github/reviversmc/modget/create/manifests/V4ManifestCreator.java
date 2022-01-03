@@ -210,7 +210,10 @@ public class V4ManifestCreator implements ManifestCreator {
         manifestV4MainPojo.setVersions(null);
 
         try {
-            return Optional.of(yamlMapper.writeValueAsString(manifestV4MainPojo));
+            return Optional.of(
+                    yamlMapper.writeValueAsString(manifestV4MainPojo)
+                            .replace("\"~\"", "~")
+            );
         } catch (IOException ex) {
             ex.printStackTrace();
         }

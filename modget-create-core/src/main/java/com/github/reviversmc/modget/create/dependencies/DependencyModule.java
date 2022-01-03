@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
+import com.fasterxml.jackson.dataformat.yaml.YAMLParser;
 import dagger.Module;
 import dagger.Provides;
 import okhttp3.OkHttpClient;
@@ -32,6 +33,12 @@ public interface DependencyModule {
     @Singleton
     static ObjectMapper yamlMapper() {
         return new ObjectMapper(new YAMLFactory()
-                .disable(YAMLGenerator.Feature.WRITE_DOC_START_MARKER));
+                .disable(YAMLParser.Feature.EMPTY_STRING_AS_NULL)
+                .disable(YAMLGenerator.Feature.MINIMIZE_QUOTES)
+                .disable(YAMLGenerator.Feature.SPLIT_LINES)
+                .disable(YAMLGenerator.Feature.WRITE_DOC_START_MARKER)
+                .enable(YAMLGenerator.Feature.INDENT_ARRAYS)
+                .enable(YAMLGenerator.Feature.INDENT_ARRAYS_WITH_INDICATOR)
+        );
     }
 }
