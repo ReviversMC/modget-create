@@ -155,9 +155,11 @@ public class CreateCommand implements Command {
             Optional<String> optionalMainManifest = manifestCreator.createMainYaml();
 
             if (optionalMainManifest.isEmpty()) {
-                colorize(
-                        "Something went wrong! Please try again",
-                        Attribute.RED_TEXT()
+                System.out.println(
+                        colorize(
+                                "Something went wrong! Please try again.",
+                                Attribute.RED_TEXT()
+                    )
                 );
                 return;
             }
