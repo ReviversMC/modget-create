@@ -35,7 +35,7 @@ public class HelpCommand implements Command {
 
     @Override
     public List<String> getCommandNames() {
-        return List.of("help");
+        return List.of("?", "help");
     }
 
     @Override
