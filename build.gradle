@@ -24,28 +24,34 @@ subprojects {
         implementation "com.github.ReviversMC.modget-manifest-api:spec3:${project.modget_manifest_api_version}"
         implementation "com.github.ReviversMC.modget-manifest-api:spec4:${project.modget_manifest_api_version}"
 
+        // Modget Library
+        implementation "com.github.ReviversMC:modget-lib:${project.modget_lib_version}"
+
         implementation "com.fasterxml.jackson.core:jackson-core:${project.jackson_version}"
         implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:${project.jackson_version}"
         implementation "com.fasterxml.jackson.core:jackson-databind:${project.jackson_version}"
         implementation "com.fasterxml.jackson.core:jackson-annotations:${project.jackson_version}"
 
-        // Modget Library
-        implementation "com.github.ReviversMC:modget-lib:${project.modget_lib_version}"
-
         implementation "org.apache.commons:commons-text:${project.commons_text_version}"
-        implementation "com.diogonunes:JColor:5.2.0"
-        implementation "com.github.TheRandomLabs:CurseAPI:master-SNAPSHOT"
-        implementation "com.google.dagger:dagger:2.40.5"
-        implementation "com.squareup.okhttp3:okhttp:4.9.3"
-        implementation "com.squareup.okhttp3:okhttp-urlconnection:4.9.3"
-        annotationProcessor "com.google.dagger:dagger-compiler:2.40.5"
+
+        //DI
+        annotationProcessor "com.google.dagger:dagger-compiler:${project.dagger_google_version}"
+        implementation "com.google.dagger:dagger:${project.dagger_google_version}"
 
         //For modget-lib and CurseAPI"s requirement of a logger.
         implementation "org.apache.logging.log4j:log4j-slf4j18-impl:${project.log4j_version}"
         implementation "org.apache.logging.log4j:log4j-core:${project.log4j_version}"
 
+        //Misc
+        implementation "com.diogonunes:JColor:${project.jcolor_version}"
+        implementation "com.github.TheRandomLabs:CurseAPI:master-SNAPSHOT"
+        implementation "com.squareup.okhttp3:okhttp:${project.okhttp3_version}"
+        implementation "com.squareup.okhttp3:okhttp-urlconnection:${project.okhttp3_version}"
+        implementation "org.fusesource.jansi:jansi:${project.jansi_version}"
+        implementation "org.jline:jline:${project.jline_version}"
+
         // JUnit Jupiter for testing
-        testImplementation "org.junit.jupiter:junit-jupiter:5.8.2"
+        testImplementation "org.junit.jupiter:junit-jupiter:${project.junit_version}"
 
         compileOnly "com.github.spotbugs:spotbugs:${project.spotbugs_version}"
     }
