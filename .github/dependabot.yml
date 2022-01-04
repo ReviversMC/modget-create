@@ -9,11 +9,7 @@ updates:
     directory: "/" # Location of package manifests
     schedule:
       interval: "daily"
-  - package-ecosystem: "gradle"
-    directory: "/modget-create-core" 
+  - package-ecosystem: "github-actions"
+    directory: "/" # Location of package manifests
     schedule:
       interval: "daily"
-  - package-ecosystem: "gradle"
-    directory: "/modget-create-cli" 
-    schedule:
-      interval: "daily"  

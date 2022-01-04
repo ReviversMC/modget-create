@@ -20,7 +20,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: Set up JDK 11
+    - name: Set up JDK 17
       uses: actions/setup-java@v2
       with:
         java-version: '17'
@@ -29,9 +29,13 @@ jobs:
       run: ./gradlew :modget-create-core:shadowJar
     - name: ShadowJar modget-create-cli
       run: ./gradlew :modget-create-cli:shadowJar
-    - name: Upload modget-create-core
+    - name: ShadowJar modget-create-gui
+      run: ./gradlew :modget-create-gui:shadowJar
+    - name: ShadowJar modget-create-combined
+      run: ./gradlew :modget-create-combined:shadowJar
+    - name: Upload modget-create-combined
       uses: actions/upload-artifact@v2
       with:
-        name: modget-create-cli-dev
-        path: modget-create-cli/build/libs/*.jar
+        name: modget-create-combined-dev
+        path: modget-create-combined/build/libs/*.jar
 

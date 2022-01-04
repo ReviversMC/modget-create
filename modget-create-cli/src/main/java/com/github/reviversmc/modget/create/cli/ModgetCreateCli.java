@@ -4,14 +4,23 @@ import java.util.Scanner;
 
 import com.diogonunes.jcolor.Attribute;
 import com.github.reviversmc.modget.create.cli.commands.CommandManager;
-import com.github.reviversmc.modget.create.cli.commands.CommandManagerComponent;
-import com.github.reviversmc.modget.create.cli.commands.DaggerCommandManagerComponent;
+import com.github.reviversmc.modget.create.main.EntryPoint;
+
+import javax.inject.Inject;
 
 import static com.diogonunes.jcolor.Ansi.colorize;
 
-public class ModgetCreateCli {
+public class ModgetCreateCli implements EntryPoint {
 
-    public static void main(String[] args) {
+    private final CommandManager commandManager;
+
+    @Inject
+    public ModgetCreateCli(CommandManager commandManager) {
+        this.commandManager = commandManager;
+    }
+
+    @Override
+    public void start() {
         System.out.println(
                 colorize(
                         "Starting modget-create...",
@@ -19,9 +28,6 @@ public class ModgetCreateCli {
                 )
         );
         Scanner scanner = new Scanner(System.in);
-
-        CommandManagerComponent commandManagerComponent = DaggerCommandManagerComponent.create();
-        CommandManager commandManager = commandManagerComponent.getCommandManager();
 
         System.out.println(
                 colorize(

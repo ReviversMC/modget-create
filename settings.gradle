@@ -9,3 +9,5 @@ rootProject.name = 'modget-create'
 
 include 'modget-create-core'
 include 'modget-create-cli'
+include 'modget-create-combined'
+include 'modget-create-gui'
