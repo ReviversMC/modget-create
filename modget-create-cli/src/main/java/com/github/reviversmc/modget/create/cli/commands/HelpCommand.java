@@ -27,7 +27,7 @@ public class HelpCommand implements Command {
                                 "\"end\"; \"exit\"; \"stop\"; \"quit\": Shut down modget-create.\n" +
                                 "\"help\": This current command.\n" +
                                 "\"supported\"; \"ver\"; \"version\": Get the version of modget-create, and the supported manifest version.\n" +
-                                "To get info on args/parameters/flags on a command, do \"help -i <command>\".",
+                                "To get info on args/parameters/flags on a command, do \"<command> --help\".",
                         Attribute.GREEN_TEXT()
                 )
         );
