@@ -1,3 +1,7 @@
 dependencies {
     implementation project(":modget-create-core")
 }
+
+jar {
+    manifest.attributes "Main-Class" : "${project.maven_group}.cli.ModgetCreateCli"
+}
