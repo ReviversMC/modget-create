@@ -1,9 +1,0 @@
-dependencies {
-    implementation project(":modget-create-cli")
-    implementation project(":modget-create-core")
-    implementation project(":modget-create-gui")
-}
-
-jar {
-    manifest.attributes "Main-Class" : "${project.maven_group}.combined.ModgetCreateCombined"
-}

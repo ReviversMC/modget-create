@@ -16,23 +16,10 @@ public class MGCCommandManager implements CommandManager {
 
     @Inject
     public MGCCommandManager(Set<Command> modgetCreateCommands,
-                             @Named("default command name") String defaultCommandName) {
+                             @Named("default") Command defaultCommand
+    ) {
         this.modgetCreateCommands = modgetCreateCommands;
-
-        Command tempDefaultCommand = null;
-        for (Command command : modgetCreateCommands) {
-
-            for (String name : command.getCommandNames()) {
-                if (name.equals(defaultCommandName)) {
-                    tempDefaultCommand = command;
-                    break;
-                }
-            }
-
-            if (tempDefaultCommand != null) break;
-        }
-
-        this.defaultCommand = tempDefaultCommand;
+        this.defaultCommand = defaultCommand;
     }
 
     @Override

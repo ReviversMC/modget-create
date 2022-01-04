@@ -1,7 +1,6 @@
 package com.github.reviversmc.modget.create.cli.commands;
 
 import javax.inject.Named;
-import javax.inject.Singleton;
 
 import dagger.Binds;
 import dagger.Module;
@@ -10,14 +9,18 @@ import dagger.multibindings.IntoSet;
 
 
 @Module
-public interface MGCCommandModule {
+public interface CommandModule {
+
         @Binds
-        @Singleton
         CommandManager commandManager(MGCCommandManager mgcCommandManager);
 
         @Binds
         @IntoSet
         Command createCommand(CreateCommand createCommand);
+
+        @Binds
+        @Named("default")
+        Command defaultCommand(HelpCommand helpCommand);
 
         @Binds
         @IntoSet
@@ -35,12 +38,4 @@ public interface MGCCommandModule {
         @IntoSet
         Command versionCommand(VersionCommand versionCommand);
 
-        @Module
-        class DefaultCommandNameModule {
-                @Provides
-                @Named("default command name")
-                public static String defaultCommandName() {
-                        return "help";
-                }
-        }
 }
