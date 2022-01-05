@@ -28,13 +28,14 @@ import java.util.Optional;
 
 public class V4ManifestCreator implements ManifestCreator {
     private final FabricModPojo modPojo;
+    private final int curseforgeId;
     private final List<String> updateAlternatives;
     private final ManifestV4MainPojo manifestV4MainPojo;
     private final ModrinthQuery modrinthQuery;
     private final ModStatus modStatus;
     private final RepoManager repoManager;
     private final String authToken; //Allow for use of custom token.
-    private final int curseforgeId;
+    private final String wiki;
     private final OkHttpClient okHttpClient;
     private final ObjectMapper yamlMapper;
 
@@ -49,6 +50,7 @@ public class V4ManifestCreator implements ManifestCreator {
             @Assisted("curseId") String curseforgeId,
             @Assisted("modJarPath") String modJarPath,
             @Assisted("modrinthId") String modrinthId,
+            @Assisted("wiki") String wiki,
             @Named("json") ObjectMapper jsonMapper,
             @Named("yaml") ObjectMapper yamlMapper,
             OkHttpClient okHttpClient
@@ -59,6 +61,7 @@ public class V4ManifestCreator implements ManifestCreator {
         this.modStatus = modStatus;
         this.repoManager = repoManager;
         this.authToken = authToken;
+        this.wiki = wiki;
 
         int tempCurseforgeId = -1;
         try {
@@ -195,18 +198,7 @@ public class V4ManifestCreator implements ManifestCreator {
         manifestV4MainPojo.setSource(modPojo.getContact().getSources());
         manifestV4MainPojo.setIssues(modPojo.getContact().getIssues());
 
-
-        if (modrinthFound)
-            manifestV4MainPojo.setWiki(optionalModrinthV1ModPojo.get().getWikiUrl().orElse("~"));
-
-        /* TODO Add wiki through CF. This is not possible atm, as CurseAPI does not support this.
-        else if (curseforgeFound)
-            manifestV4MainPojo.setWiki(optionalCurseProject.get().links().wiki());
-         */
-
-        else //Set null and not ~, as a wiki could still be referenced though cf.
-            manifestV4MainPojo.setWiki(null);
-
+        manifestV4MainPojo.setWiki(wiki);
 
         ManifestV4MainPojo.Chats chats = new ManifestV4MainPojo.Chats();
         chats.setIrc(modPojo.getContact().getIrc());

@@ -41,11 +41,13 @@ public class CreateCommand implements Command {
         Optional<String> optionalModrinthId = ArgObtainer.obtainFirst(args, List.of("-mr", "--modrinth"));
         Optional<String> optionalJarPath = ArgObtainer.obtainFirst(args, List.of("-j", "-jar", "--jar"));
         Optional<String> optionalStatus = ArgObtainer.obtainFirst(args, List.of("-s", "--status"));
+        Optional<String> optionalWiki = ArgObtainer.obtainFirst(args, List.of("-w", "--wiki"));
 
         if (optionalCurseforgeId.isEmpty() ||
                 optionalModrinthId.isEmpty() ||
                 optionalJarPath.isEmpty() ||
-                optionalStatus.isEmpty()
+                optionalStatus.isEmpty() ||
+                optionalWiki.isEmpty()
         ) { //Should never happen.
 
             System.out.println(
@@ -126,7 +128,8 @@ public class CreateCommand implements Command {
                     token,
                     optionalCurseforgeId.get(),
                     optionalJarPath.get(),
-                    optionalModrinthId.get()
+                    optionalModrinthId.get(),
+                    optionalWiki.get()
             );
 
             if (!manifestCreator.isUsable()) {
@@ -225,7 +228,8 @@ public class CreateCommand implements Command {
                 List.of("-cf", "--curseforge"),
                 List.of("-j", "-jar", "--jar"),
                 List.of("-mr", "--modrinth"),
-                List.of("-s", "--status")
+                List.of("-s", "--status"),
+                List.of("-w", "--wiki")
         );
     }
 }

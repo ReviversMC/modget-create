@@ -14,6 +14,7 @@ public interface ManifestCreatorFactory {
             @Assisted("authToken") String authToken,
             @Assisted("curseId") String curseforgeId,
             @Assisted("modJarPath") String modJarPath,
-            @Assisted("modrinthId") String modrinthId
+            @Assisted("modrinthId") String modrinthId,
+            @Assisted("wiki") String wiki
     );
 }
