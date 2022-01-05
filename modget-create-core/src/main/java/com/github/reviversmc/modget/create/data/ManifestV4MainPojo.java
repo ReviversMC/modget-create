@@ -161,7 +161,7 @@ public class ManifestV4MainPojo {
     public static class Chats {
         private String discord;
         private String irc;
-        private MiscChats[] others;
+        private MiscChat[] others;
 
         public String getDiscord() {
             return discord;
@@ -179,15 +179,15 @@ public class ManifestV4MainPojo {
             this.irc = irc;
         }
 
-        public MiscChats[] getOthers() {
+        public MiscChat[] getOthers() {
             return others;
         }
 
-        public void setOthers(MiscChats[] others) {
+        public void setOthers(MiscChat[] others) {
             this.others = others;
         }
 
-        public static class MiscChats {
+        public static class MiscChat {
             private String name;
             private String url;
 
