@@ -140,7 +140,18 @@ public class CreateCommand implements Command {
                 return;
             }
 
-            if (manifestCreator.isModPresent()) {
+            boolean forceRecreate = args.containsKey("-force") || args.containsKey("--force-recreate");
+
+            if (forceRecreate) {
+                System.out.println(
+                        colorize(
+                                "Warning: You are creating a manifest for mod that already has a manifest!",
+                                Attribute.YELLOW_TEXT()
+                        )
+                );
+            }
+
+            if (manifestCreator.isModPresent() && !forceRecreate) {
                 System.out.println(
                         colorize(
                                 "Thanks for wanting to contribute, but the manifest for this mod already exists," +
@@ -152,7 +163,7 @@ public class CreateCommand implements Command {
                 return;
             }
 
-            Optional<String> optionalMainManifest = manifestCreator.createMainYaml();
+            Optional<String> optionalMainManifest = manifestCreator.createMainYaml(forceRecreate);
 
             if (optionalMainManifest.isEmpty()) {
                 System.out.println(
@@ -197,7 +208,15 @@ public class CreateCommand implements Command {
 
     @Override
     public List<String> getOptionalParameters() {
-        return List.of("-o", "--output", "-t", "--token", "-ua", "--update-alternatives");
+        return List.of("-force",
+                "--force-recreate",
+                "-o",
+                "--output",
+                "-t",
+                "--token",
+                "-ua",
+                "--update-alternatives"
+        );
     }
 
     @Override
