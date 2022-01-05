@@ -48,9 +48,6 @@ public class CLIGithubOAuthGuider implements TokenOAuthGuider {
                     ) + colorize(
                             verifyCodePojo.getUserCode(),
                             Attribute.BOLD()
-                    ) + colorize(
-                            ".",
-                            Attribute.GREEN_TEXT()
                     )
             );
 
