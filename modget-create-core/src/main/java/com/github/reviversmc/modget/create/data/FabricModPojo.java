@@ -79,9 +79,30 @@ public class FabricModPojo {
 
     public static class Contact {
 
+        private String email = "~";
+        private String irc = "~";
+
         private String homepage = "~";
         private String sources = "~";
         private String issues = "~";
+
+        private final Map<String, Object> others = new HashMap<>();
+
+        public String getEmail() {
+            return email;
+        }
+
+        public void setEmail(String email) {
+            this.email = email;
+        }
+
+        public String getIrc() {
+            return irc;
+        }
+
+        public void setIrc(String irc) {
+            this.irc = irc;
+        }
 
         public String getHomepage() {
             return homepage;
@@ -107,13 +128,13 @@ public class FabricModPojo {
             this.issues = issues;
         }
 
-        /*
-        This is a huge dumping group for all values, as there can be so many dynamic values.
-        Should never actually be used to get values!
-        */
         @JsonAnySetter
-        public void addJson(String key, Object value) {
-            //Purposefully empty.
+        public void addOthers(String key, Object value) {
+            others.put(key, value);
+        }
+
+        public Map<String, Object> getOthers() {
+            return others;
         }
     }
 }
