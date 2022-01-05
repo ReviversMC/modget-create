@@ -13,6 +13,7 @@ import okhttp3.ResponseBody;
 
 import javax.inject.Named;
 import java.io.IOException;
+import java.util.Optional;
 
 public class ModrinthV1Query implements ModrinthQuery {
 
@@ -32,7 +33,7 @@ public class ModrinthV1Query implements ModrinthQuery {
     }
 
     @Override
-    public ModrinthV1ModPojo getMod() {
+    public Optional<ModrinthV1ModPojo> getMod() {
         if (modExists()) {
             Request request = new Request.Builder()
                     .url("https://api.modrinth.com/api/v1/mod/" + projectId)
@@ -45,22 +46,27 @@ public class ModrinthV1Query implements ModrinthQuery {
                 if (responseBody != null) {
                     String responseBodyString = responseBody.string();
                     response.close();
-                    return jsonMapper.readValue(responseBodyString, ModrinthV1ModPojo.class);
+                    return Optional.of(
+                            jsonMapper.readValue(responseBodyString, ModrinthV1ModPojo.class)
+                    );
                 }
 
             } catch (IOException ex) {
                 ex.printStackTrace();
             }
         }
-        return new ModrinthV1ModPojo();
+        return Optional.empty();
     }
 
     @Override
-    public ModrinthV1TeamMemberPojo[] getTeamMembers() {
+    public Optional<ModrinthV1TeamMemberPojo[]> getTeamMembers() {
         if (modExists()) {
-            ModrinthV1ModPojo modPojo = getMod();
+            Optional<ModrinthV1ModPojo> optionalModPojo = getMod();
+            if (optionalModPojo.isEmpty()) return Optional.empty();
+
             Request request = new Request.Builder()
-                    .url("https://api.modrinth.com/api/v1/team/" + modPojo.getTeam() + "/members")
+                    .url("https://api.modrinth.com/api/v1/team/" +
+                            optionalModPojo.get().getTeam() + "/members")
                     .build();
 
             try {
@@ -70,21 +76,25 @@ public class ModrinthV1Query implements ModrinthQuery {
                 if (responseBody != null) {
                     String responseBodyString = responseBody.string();
                     response.close();
-                    return jsonMapper.readValue(responseBodyString, ModrinthV1TeamMemberPojo[].class);
+                    return Optional.of(
+                            jsonMapper.readValue(responseBodyString, ModrinthV1TeamMemberPojo[].class)
+                    );
                 }
 
             } catch (IOException ex) {
                 ex.printStackTrace();
             }
         }
-        return new ModrinthV1TeamMemberPojo[0];
+        return Optional.empty();
     }
 
     @Override
-    public ModrinthV1UserPojo getOwner() {
+    public Optional<ModrinthV1UserPojo> getOwner() {
         if (modExists()) {
-            ModrinthV1TeamMemberPojo[] teamMemberPojos = getTeamMembers();
-            for (ModrinthV1TeamMemberPojo teamMemberPojo : teamMemberPojos) {
+            Optional<ModrinthV1TeamMemberPojo[]> optionalTeamMemberPojos = getTeamMembers();
+            if (optionalTeamMemberPojos.isEmpty()) return Optional.empty();
+
+            for (ModrinthV1TeamMemberPojo teamMemberPojo : optionalTeamMemberPojos.get()) {
                 if (!teamMemberPojo.getRole().equalsIgnoreCase("Owner")) continue;
 
                 Request request = new Request.Builder()
@@ -98,7 +108,9 @@ public class ModrinthV1Query implements ModrinthQuery {
                     if (responseBody != null) {
                         String responseBodyString = responseBody.string();
                         response.close();
-                        return jsonMapper.readValue(responseBodyString, ModrinthV1UserPojo.class);
+                        return Optional.of(
+                                jsonMapper.readValue(responseBodyString, ModrinthV1UserPojo.class)
+                        );
                     }
 
                 } catch (IOException ex) {
@@ -106,7 +118,7 @@ public class ModrinthV1Query implements ModrinthQuery {
                 }
             }
         }
-        return new ModrinthV1UserPojo();
+        return Optional.empty();
     }
 
     @Override
