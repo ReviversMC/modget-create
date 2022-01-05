@@ -3,9 +3,7 @@ package com.github.reviversmc.modget.create.manifests;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.reviversmc.modget.create.apicalls.ModrinthQuery;
 import com.github.reviversmc.modget.create.apicalls.ModrinthQueryFactory;
-import com.github.reviversmc.modget.create.data.FabricModPojo;
-import com.github.reviversmc.modget.create.data.ManifestV4MainPojo;
-import com.github.reviversmc.modget.create.data.ModStatus;
+import com.github.reviversmc.modget.create.data.*;
 import com.github.reviversmc.modget.library.manager.RepoManager;
 import com.github.reviversmc.modget.manifests.spec4.api.data.manifest.main.ModAuthor;
 import com.github.reviversmc.modget.manifests.spec4.api.data.manifest.main.ModManifest;
@@ -37,7 +35,6 @@ public class V4ManifestCreator implements ManifestCreator {
     private final RepoManager repoManager;
     private final String authToken; //Allow for use of custom token.
     private final int curseforgeId;
-    private final String modrinthId;
     private final OkHttpClient okHttpClient;
     private final ObjectMapper yamlMapper;
 
@@ -71,7 +68,6 @@ public class V4ManifestCreator implements ManifestCreator {
         }
         this.curseforgeId = tempCurseforgeId;
 
-        this.modrinthId = modrinthId;
         this.okHttpClient = okHttpClient;
         this.yamlMapper = yamlMapper;
 
@@ -105,8 +101,14 @@ public class V4ManifestCreator implements ManifestCreator {
 
     @Override
     public Optional<String> createMainYaml() {
+        return createMainYaml(false);
+    }
 
-        if (!isUsable() || isModPresent()) return Optional.empty();
+    @Override
+    public Optional<String> createMainYaml(boolean forceCreate) {
+
+        if (!isUsable()) return Optional.empty();
+        if (!forceCreate && isModPresent()) return Optional.empty();
 
         //noinspection HttpUrlsUsage
         boolean githubFound = modPojo.getContact().getSources().toLowerCase().startsWith("http://github.com/")
@@ -123,8 +125,9 @@ public class V4ManifestCreator implements ManifestCreator {
             return Optional.empty();
         }
 
-
         boolean modrinthFound = modrinthQuery.modExists();
+        Optional<ModrinthV1ModPojo> optionalModrinthV1ModPojo = modrinthQuery.getMod();
+        if (modrinthFound && optionalModrinthV1ModPojo.isEmpty()) return Optional.empty(); //Should never happen.
 
         //Set publisher
         if (githubFound) {
@@ -141,27 +144,26 @@ public class V4ManifestCreator implements ManifestCreator {
         } else if (curseforgeFound)
             manifestV4MainPojo.setPublisher(optionalCurseProject.get().author().name());
 
-        else if (modrinthFound)
-            manifestV4MainPojo.setPublisher(modrinthQuery.getOwner().getName());
-
-        else //Don't bother creating a manifest if it is not listed on either of the above three platforms.
+        else if (modrinthFound) {
+            Optional<ModrinthV1UserPojo> optionalModOwner = modrinthQuery.getOwner();
+            if (optionalModOwner.isPresent())
+                manifestV4MainPojo.setPublisher(optionalModOwner.get().getName());
+            else return Optional.empty(); //Should never happen.
+        } else //Don't bother creating a manifest if it is not listed on either of the above three platforms.
             return Optional.empty();
 
         //For icons, they are all non-mutually exclusive.
         List<String> iconUrls = new ArrayList<>();
 
         if (modrinthFound)
-            modrinthQuery.getMod().getIconUrl().ifPresent(iconUrls::add);
+            optionalModrinthV1ModPojo.get().getIconUrl().ifPresent(iconUrls::add);
 
         if (curseforgeFound) {
             HttpUrl iconUrl = optionalCurseProject.get().logo().url();
             if (iconUrl != null) iconUrls.add(iconUrl.toString());
         }
 
-        if (githubFound) {
-            //TODO Use api calls to check for an icon.
-        }
-
+        //GitHub check is welcome, but there may not be a consistent way to find icon.pngs.
         manifestV4MainPojo.setIconUrls(iconUrls.toArray(new String[0]));
 
         manifestV4MainPojo.setStatus(modStatus.name().toLowerCase());
@@ -189,22 +191,57 @@ public class V4ManifestCreator implements ManifestCreator {
 
         manifestV4MainPojo.setAuthors(authorList.toArray(new ManifestV4MainPojo.Author[0]));
 
-        /*
-        Get home either from mod.json gh, or mr page, or cf page.
-         */
-
+        manifestV4MainPojo.setHome(modPojo.getContact().getHomepage());
         manifestV4MainPojo.setSource(modPojo.getContact().getSources());
         manifestV4MainPojo.setIssues(modPojo.getContact().getIssues());
 
 
-        //TODO Maybe one day find out a way to do support? Disc first, next is issues.
-        manifestV4MainPojo.setSupport(null);
+        if (modrinthFound)
+            manifestV4MainPojo.setWiki(optionalModrinthV1ModPojo.get().getWikiUrl().orElse("~"));
 
-        //TODO Check if wiki exists via graphql call.
-        manifestV4MainPojo.setWiki(null);
+        /* TODO Add wiki through CF. This is not possible atm, as CurseAPI does not support this.
+        else if (curseforgeFound)
+            manifestV4MainPojo.setWiki(optionalCurseProject.get().links().wiki());
+         */
 
-        //TODO Get chats from CF/Modrinth.
-        manifestV4MainPojo.setChats(null);
+        else //Set null and not ~, as a wiki could still be referenced though cf.
+            manifestV4MainPojo.setWiki(null);
+
+
+        ManifestV4MainPojo.Chats chats = new ManifestV4MainPojo.Chats();
+        chats.setIrc(modPojo.getContact().getIrc());
+
+        List<ManifestV4MainPojo.Chats.MiscChat> miscChats = new ArrayList<>();
+
+        modPojo.getContact().getOthers().forEach(
+                (String key, Object value) -> {
+                    if (key.equalsIgnoreCase("discord")) chats.setDiscord(value.toString());
+                    else {
+                        ManifestV4MainPojo.Chats.MiscChat miscChat = new ManifestV4MainPojo.Chats.MiscChat();
+                        miscChat.setName(key);
+                        miscChat.setUrl(value.toString());
+                        miscChats.add(miscChat);
+                    }
+                }
+        );
+
+        if (!miscChats.isEmpty()) chats.setOthers(miscChats.toArray(new ManifestV4MainPojo.Chats.MiscChat[0]));
+        else chats.setOthers(null); //Will be fixed later, through String#replace.
+
+        if (modrinthFound) {
+            if (optionalModrinthV1ModPojo.get().getDiscordUrl().isPresent())
+                chats.setDiscord(optionalModrinthV1ModPojo.get().getDiscordUrl().get());
+        }
+
+        manifestV4MainPojo.setChats(chats);
+
+        if (!manifestV4MainPojo.getChats().getDiscord().equalsIgnoreCase("~"))
+            manifestV4MainPojo.setSupport(manifestV4MainPojo.getChats().getDiscord());
+        else if (!manifestV4MainPojo.getChats().getIrc().equalsIgnoreCase("~"))
+            manifestV4MainPojo.setSupport(manifestV4MainPojo.getChats().getIrc());
+        else if (manifestV4MainPojo.getChats().getOthers().length != 0)
+            manifestV4MainPojo.setSupport(manifestV4MainPojo.getChats().getOthers()[0].getUrl());
+        else manifestV4MainPojo.setSupport(manifestV4MainPojo.getIssues()); //Automatically Tilde if NA.
 
         //TODO Set versions from CF/Modrinth.
         manifestV4MainPojo.setVersions(null);
@@ -212,7 +249,17 @@ public class V4ManifestCreator implements ManifestCreator {
         try {
             return Optional.of(
                     yamlMapper.writeValueAsString(manifestV4MainPojo)
-                            .replace("\"~\"", "~")
+                            /*
+                            Make it so that Tilde is never in quotes, but all other strings are.
+                            Example format:
+
+                            fieldA: "some value"
+                            fieldB: ~
+                            */
+                            .replace(": \"~\"", ": ~")
+
+                            //Fix issue of chats.others being represented incorrectly as null.
+                            .replace("others: null", "others: ~")
             );
         } catch (IOException ex) {
             ex.printStackTrace();
