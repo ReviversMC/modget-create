@@ -9,7 +9,8 @@ import java.util.List;
 @AssistedFactory
 public interface ManifestCreatorFactory {
     V4ManifestCreator create(
-            List<String> updateAlternatives,
+            @Assisted("modVersions") List<String> modVersions,
+            @Assisted("updateAlternatives") List<String> updateAlternatives,
             ModStatus modStatus,
             @Assisted("authToken") String authToken,
             @Assisted("curseId") String curseforgeId,

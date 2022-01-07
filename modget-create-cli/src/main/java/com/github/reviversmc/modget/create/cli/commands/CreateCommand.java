@@ -36,17 +36,19 @@ public class CreateCommand implements Command {
     @Override
     public void onCommand(Map<String, Optional<String>> args) {
 
-        //CF id, manifest creator, and MR id will definitely have a value, as they are mandatory values.
+        //All of these will definitely have a value, as they are mandatory values.
         Optional<String> optionalCurseforgeId = ArgObtainer.obtainFirst(args, List.of("-cf", "--curseforge"));
         Optional<String> optionalModrinthId = ArgObtainer.obtainFirst(args, List.of("-mr", "--modrinth"));
         Optional<String> optionalJarPath = ArgObtainer.obtainFirst(args, List.of("-j", "-jar", "--jar"));
         Optional<String> optionalStatus = ArgObtainer.obtainFirst(args, List.of("-s", "--status"));
+        Optional<List<String>> optionalModVersions = ArgObtainer.obtainAll(args, List.of("-v", "-ver", "--version"));
         Optional<String> optionalWiki = ArgObtainer.obtainFirst(args, List.of("-w", "--wiki"));
 
         if (optionalCurseforgeId.isEmpty() ||
                 optionalModrinthId.isEmpty() ||
                 optionalJarPath.isEmpty() ||
                 optionalStatus.isEmpty() ||
+                optionalModVersions.isEmpty() ||
                 optionalWiki.isEmpty()
         ) { //Should never happen.
 
@@ -123,6 +125,7 @@ public class CreateCommand implements Command {
             );
 
             ManifestCreator manifestCreator = manifestCreatorFactory.create(
+                    optionalModVersions.get(),
                     optionalUpdateAlternatives.orElseGet(List::of),
                     modStatus,
                     token,
@@ -229,6 +232,7 @@ public class CreateCommand implements Command {
                 List.of("-j", "-jar", "--jar"),
                 List.of("-mr", "--modrinth"),
                 List.of("-s", "--status"),
+                List.of("-v", "-ver", "--version"),
                 List.of("-w", "--wiki")
         );
     }

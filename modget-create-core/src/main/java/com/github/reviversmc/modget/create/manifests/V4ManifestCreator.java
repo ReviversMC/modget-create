@@ -29,6 +29,7 @@ import java.util.Optional;
 public class V4ManifestCreator implements ManifestCreator {
     private final FabricModPojo modPojo;
     private final int curseforgeId;
+    private final List<String> modVersions;
     private final List<String> updateAlternatives;
     private final ManifestV4MainPojo manifestV4MainPojo;
     private final ModrinthQuery modrinthQuery;
@@ -41,7 +42,8 @@ public class V4ManifestCreator implements ManifestCreator {
 
     @AssistedInject
     public V4ManifestCreator(
-            @Assisted List<String> updateAlternatives,
+            @Assisted("modVersions") List<String> modVersions,
+            @Assisted("updateAlternatives") List<String> updateAlternatives,
             ManifestV4MainPojo manifestV4MainPojo,
             ModrinthQueryFactory modrinthQueryFactory,
             @Assisted ModStatus modStatus,
@@ -55,6 +57,7 @@ public class V4ManifestCreator implements ManifestCreator {
             @Named("yaml") ObjectMapper yamlMapper,
             OkHttpClient okHttpClient
     ) {
+        this.modVersions = modVersions;
         this.updateAlternatives = updateAlternatives;
         this.manifestV4MainPojo = manifestV4MainPojo;
         this.modrinthQuery = modrinthQueryFactory.create(modrinthId);
@@ -235,8 +238,15 @@ public class V4ManifestCreator implements ManifestCreator {
             manifestV4MainPojo.setSupport(manifestV4MainPojo.getChats().getOthers()[0].getUrl());
         else manifestV4MainPojo.setSupport(manifestV4MainPojo.getIssues()); //Automatically Tilde if NA.
 
-        //TODO Set versions from CF/Modrinth.
-        manifestV4MainPojo.setVersions(null);
+        List<ManifestV4MainPojo.Version> modVersionList = new ArrayList<>();
+        for (String modVersionCandidate : modVersions) {
+            ManifestV4MainPojo.Version modVersion = new ManifestV4MainPojo.Version();
+            modVersion.setVersion(modVersionCandidate);
+            modVersionList.add(modVersion);
+        }
+
+        manifestV4MainPojo.setVersions(modVersionList.toArray(new ManifestV4MainPojo.Version[0]));
+
 
         try {
             return Optional.of(
