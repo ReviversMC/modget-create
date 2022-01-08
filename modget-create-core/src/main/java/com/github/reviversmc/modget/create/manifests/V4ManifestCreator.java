@@ -17,6 +17,9 @@ import com.therandomlabs.curseapi.project.CurseProject;
 import dagger.assisted.Assisted;
 import dagger.assisted.AssistedInject;
 import okhttp3.*;
+import org.kohsuke.github.GitHub;
+import org.kohsuke.github.GitHubBuilder;
+import org.kohsuke.github.extras.okhttp3.OkHttpGitHubConnector;
 
 import javax.inject.Named;
 import java.io.*;
@@ -25,9 +28,11 @@ import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Properties;
 
 public class V4ManifestCreator implements ManifestCreator {
     private final FabricModPojo modPojo;
+    private final GitHub githubAPI;
     private final int curseforgeId;
     private final List<String> modVersions;
     private final List<String> updateAlternatives;
@@ -39,6 +44,8 @@ public class V4ManifestCreator implements ManifestCreator {
     private final String wiki;
     private final OkHttpClient okHttpClient;
     private final ObjectMapper yamlMapper;
+
+    private final boolean isUsable;
 
     @AssistedInject
     public V4ManifestCreator(
@@ -65,6 +72,25 @@ public class V4ManifestCreator implements ManifestCreator {
         this.repoManager = repoManager;
         this.authToken = authToken;
         this.wiki = wiki;
+
+        Properties authProperties = new Properties();
+        authProperties.setProperty("oauth", authToken);
+
+        GitHub tempGithubAPI;
+        try {
+            tempGithubAPI = GitHubBuilder.fromProperties(authProperties)
+                    .withConnector(
+                            new OkHttpGitHubConnector(
+                                    okHttpClient
+                            )
+                    ).build();
+
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            tempGithubAPI = null;
+        }
+
+        this.githubAPI = tempGithubAPI;
 
         int tempCurseforgeId = -1;
         try {
@@ -93,7 +119,8 @@ public class V4ManifestCreator implements ManifestCreator {
                 InputStream modJsonStream = classLoader.getResourceAsStream("fabric.mod.json");
 
                 if (modJsonStream != null) {
-                    tempModPojo = jsonMapper.readValue(modJsonStream, FabricModPojo.class);
+                    tempModPojo =
+                            jsonMapper.readValue(modJsonStream, FabricModPojo.class);
                 }
             } catch (IOException ex) {
                 ex.printStackTrace();
@@ -103,6 +130,18 @@ public class V4ManifestCreator implements ManifestCreator {
         //Let modPojo be null if mod doesn't exist, instead of empty class.
         modPojo = tempModPojo;
 
+        isUsable = githubAPI != null && githubAPI.isCredentialValid() && modPojo != null;
+
+    }
+
+    @Override
+    public Optional<String> createLookupTable() {
+        return createLookupTable(false);
+    }
+
+    @Override
+    public Optional<String> createLookupTable(boolean forceCreate) {
+        return Optional.empty();
     }
 
     @Override
@@ -272,6 +311,8 @@ public class V4ManifestCreator implements ManifestCreator {
 
     @Override
     public boolean isModPresent() {
+        if (!isUsable()) return false;
+
         try {
             ManifestRepository mainManifestRepo = repoManager.getRepo(0);
 
@@ -300,6 +341,6 @@ public class V4ManifestCreator implements ManifestCreator {
 
     @Override
     public boolean isUsable() {
-        return modPojo != null;
+        return isUsable;
     }
 }

@@ -11,31 +11,31 @@ import dagger.multibindings.IntoSet;
 @Module
 public interface CommandModule {
 
-        @Binds
-        CommandManager commandManager(MGCCommandManager mgcCommandManager);
+    @Binds
+    CommandManager commandManager(MGCCommandManager mgcCommandManager);
 
-        @Binds
-        @IntoSet
-        Command createCommand(CreateCommand createCommand);
+    @Binds
+    @IntoSet
+    Command createCommand(CreateCommand createCommand);
 
-        @Binds
-        @Named("default")
-        Command defaultCommand(HelpCommand helpCommand);
+    @Binds
+    @Named("default")
+    Command defaultCommand(HelpCommand helpCommand);
 
-        @Binds
-        @IntoSet
-        Command exitCommand(ExitCommand exitCommand);
+    @Binds
+    @IntoSet
+    Command exitCommand(ExitCommand exitCommand);
 
-        @Binds
-        @IntoSet
-        Command helpCommand(HelpCommand helpCommand);
+    @Binds
+    @IntoSet
+    Command helpCommand(HelpCommand helpCommand);
 
-        @Binds
-        @IntoSet
-        Command loginCommand(LoginCommand loginCommand);
+    @Binds
+    @IntoSet
+    Command loginCommand(LoginCommand loginCommand);
 
-        @Binds
-        @IntoSet
-        Command versionCommand(VersionCommand versionCommand);
+    @Binds
+    @IntoSet
+    Command versionCommand(VersionCommand versionCommand);
 
 }

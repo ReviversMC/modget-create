@@ -78,123 +78,123 @@ public class CreateCommand implements Command {
         }
 
 
-            //Start search for optional args
-            Optional<String> optionalOutputFolder = ArgObtainer.obtainFirst(args, List.of("-o", "--output"));
-            File outputFolder = null;
+        //Start search for optional args
+        Optional<String> optionalOutputFolder = ArgObtainer.obtainFirst(args, List.of("-o", "--output"));
+        File outputFolder = null;
 
-            if (optionalOutputFolder.isPresent()) {
-                outputFolder = new File(optionalOutputFolder.get());
+        if (optionalOutputFolder.isPresent()) {
+            outputFolder = new File(optionalOutputFolder.get());
 
-                if (!outputFolder.exists() || !outputFolder.isDirectory()) {
-                    System.out.println(
-                            colorize(
-                                    "The provided output directory is invalid!\n" +
-                                            "If you meant to let modget-create do a PR for you, don't specify an output directory! (-o/--output)",
-                                    Attribute.RED_TEXT()
-                            )
-                    );
-                    return;
-                }
+            if (!outputFolder.exists() || !outputFolder.isDirectory()) {
+                System.out.println(
+                        colorize(
+                                "The provided output directory is invalid!\n" +
+                                        "If you meant to let modget-create do a PR for you, don't specify an output directory! (-o/--output)",
+                                Attribute.RED_TEXT()
+                        )
+                );
+                return;
             }
+        }
 
-            Optional<String> optionalToken = ArgObtainer.obtainFirst(args, List.of("-t", "--token"));
-            String token;
+        Optional<String> optionalToken = ArgObtainer.obtainFirst(args, List.of("-t", "--token"));
+        String token;
 
-            if (optionalToken.isPresent()) {
-                token = optionalToken.get();
-                if (!tokenManager.validateToken(token)) {
-                    System.out.println(
-                            colorize(
-                                    "Your GitHub token is invalid! Please ensure that it has the " +
-                                            "\"public_repo\" scope.",
-                                    Attribute.RED_TEXT()
-                            )
-                    );
-                    return;
-                }
-            } else {
+        if (optionalToken.isPresent()) {
+            token = optionalToken.get();
+            if (!tokenManager.validateToken(token)) {
+                System.out.println(
+                        colorize(
+                                "Your GitHub token is invalid! Please ensure that it has the " +
+                                        "\"public_repo\" scope.",
+                                Attribute.RED_TEXT()
+                        )
+                );
+                return;
+            }
+        } else {
+            optionalToken = tokenManager.getToken();
+            if (optionalToken.isEmpty()) {
+                tokenOAuthGuider.guide();
                 optionalToken = tokenManager.getToken();
-                if (optionalToken.isEmpty()) {
-                    tokenOAuthGuider.guide();
-                    optionalToken = tokenManager.getToken();
-                }
-
-                if (optionalToken.isPresent()) token = optionalToken.get();
-                else { //User rejected oAuth.
-                    //No token, which is required.
-                    System.out.println(
-                            colorize(
-                                    "You have no valid GitHub token!" +
-                                            "Please try again with a GitHub token, " +
-                                            "or approve the authentication code when you are presented with it.",
-                                    Attribute.RED_TEXT()
-                            )
-                    );
-                    return;
-                }
             }
 
-            List<String> updateAlternatives = ArgObtainer.obtainAll(
-                    args, List.of("-ua", "--update-alternatives")
-            );
-
-            ManifestCreator manifestCreator = manifestCreatorFactory.create(
-                    modVersions,
-                    updateAlternatives,
-                    modStatus,
-                    token,
-                    optionalCurseforgeId.get(),
-                    optionalJarPath.get(),
-                    optionalModrinthId.get(),
-                    optionalWiki.get()
-            );
-
-            if (!manifestCreator.isUsable()) {
+            if (optionalToken.isPresent()) token = optionalToken.get();
+            else { //User rejected oAuth.
+                //No token, which is required.
                 System.out.println(
                         colorize(
-                                "You did not specify a valid Fabric mod using \"-j <path-to-mod>\" " +
-                                        "or \"--jar <path-to-mod>\"!",
+                                "You have no valid GitHub token!" +
+                                        "Please try again with a GitHub token, " +
+                                        "or approve the authentication code when you are presented with it.",
                                 Attribute.RED_TEXT()
                         )
                 );
                 return;
             }
+        }
 
-            boolean forceRecreate = args.containsKey("-force") || args.containsKey("--force-recreate");
+        List<String> updateAlternatives = ArgObtainer.obtainAll(
+                args, List.of("-ua", "--update-alternatives")
+        );
 
-            if (forceRecreate) {
-                System.out.println(
-                        colorize(
-                                "Warning: You are creating a manifest for mod that already has a manifest!",
-                                Attribute.YELLOW_TEXT()
-                        )
-                );
-            }
+        ManifestCreator manifestCreator = manifestCreatorFactory.create(
+                modVersions,
+                updateAlternatives,
+                modStatus,
+                token,
+                optionalCurseforgeId.get(),
+                optionalJarPath.get(),
+                optionalModrinthId.get(),
+                optionalWiki.get()
+        );
 
-            if (manifestCreator.isModPresent() && !forceRecreate) {
-                System.out.println(
-                        colorize(
-                                "Thanks for wanting to contribute, but the manifest for this mod already exists," +
-                                        " or is currently being PR-ed by someone else!\n" +
-                                        "Cancelling operation...",
-                                Attribute.YELLOW_TEXT()
-                        )
-                );
-                return;
-            }
-
-            Optional<String> optionalMainManifest = manifestCreator.createMainYaml(forceRecreate);
-            Optional<String> optionalLookupTable = manifestCreator.createLookupTable(forceRecreate);
-
-            if (optionalMainManifest.isEmpty() || optionalLookupTable.isEmpty()) {
-                System.out.println(
-                        colorize(
-                                "Something went wrong! Please try again.",
-                                Attribute.RED_TEXT()
+        if (!manifestCreator.isUsable()) {
+            System.out.println(
+                    colorize(
+                            "You did not specify a valid Fabric mod using \"-j <path-to-mod>\" " +
+                                    "or \"--jar <path-to-mod>\"!",
+                            Attribute.RED_TEXT()
                     )
-                );
-                return;
-            }
+            );
+            return;
+        }
+
+        boolean forceRecreate = args.containsKey("-force") || args.containsKey("--force-recreate");
+
+        if (forceRecreate) {
+            System.out.println(
+                    colorize(
+                            "Warning: You are creating a manifest for mod that already has a manifest!",
+                            Attribute.YELLOW_TEXT()
+                    )
+            );
+        }
+
+        if (manifestCreator.isModPresent() && !forceRecreate) {
+            System.out.println(
+                    colorize(
+                            "Thanks for wanting to contribute, but the manifest for this mod already exists," +
+                                    " or is currently being PR-ed by someone else!\n" +
+                                    "Cancelling operation...",
+                            Attribute.YELLOW_TEXT()
+                    )
+            );
+            return;
+        }
+
+        Optional<String> optionalMainManifest = manifestCreator.createMainYaml(forceRecreate);
+        Optional<String> optionalLookupTable = manifestCreator.createLookupTable(forceRecreate);
+
+        if (optionalMainManifest.isEmpty() || optionalLookupTable.isEmpty()) {
+            System.out.println(
+                    colorize(
+                            "Something went wrong! Please try again.",
+                            Attribute.RED_TEXT()
+                    )
+            );
+            return;
+        }
 
         try {
             if (optionalOutputFolder.isPresent()) {

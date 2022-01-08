@@ -1,22 +1,26 @@
 package com.github.reviversmc.modget.create.github;
 
 
+import okhttp3.OkHttpClient;
+import org.kohsuke.github.GitHubBuilder;
+import org.kohsuke.github.extras.okhttp3.OkHttpGitHubConnector;
+
+import java.io.IOException;
 import java.util.Optional;
+import java.util.Properties;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import com.github.reviversmc.modget.create.apicalls.GithubQueryFactory;
-
 @Singleton
 public class GithubTokenManager implements TokenManager {
 
-    private final GithubQueryFactory githubQueryFactory;
+    private final OkHttpClient okHttpClient;
     private String githubToken;
 
     @Inject
-    public GithubTokenManager(GithubQueryFactory githubQueryFactory) {
-        this.githubQueryFactory = githubQueryFactory;
+    public GithubTokenManager(OkHttpClient okHttpClient) {
+        this.okHttpClient = okHttpClient;
     }
 
     @Override
@@ -36,14 +40,22 @@ public class GithubTokenManager implements TokenManager {
 
     @Override
     public boolean validateToken(String token) {
+        //We unfortunately cannot check the scope of the token with the api.
+        Properties authProperties = new Properties();
+        authProperties.setProperty("oauth", token);
 
+        try {
+            return GitHubBuilder.fromProperties(authProperties)
+                    .withConnector(
+                            new OkHttpGitHubConnector(
+                                    okHttpClient
+                            )
+                    ).build()
+                    .isCredentialValid();
 
-        String scopes = githubQueryFactory.create(token).getScopes();
-        if (scopes == null) return false;
-
-        for (String scope : scopes.split(", ")) {
-            if (scope.equals("public_repo")) return true;
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            return false;
         }
-        return false;
     }
 }

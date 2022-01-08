@@ -13,7 +13,8 @@ public class ArgObtainer {
 
     /**
      * Obtain the first occurrence of the argument found.
-     * @param args The list of arguments to check.
+     *
+     * @param args     The list of arguments to check.
      * @param toObtain The arguments to find.
      * @return An {@link Optional} with a value if found, or an empty {@link Optional} otherwise.
      */
@@ -27,7 +28,8 @@ public class ArgObtainer {
 
     /**
      * Obtain the first occurrence of the argument found.
-     * @param args The list of arguments to check.
+     *
+     * @param args     The list of arguments to check.
      * @param toObtain The arguments to find.
      * @return A list of all found values.
      */

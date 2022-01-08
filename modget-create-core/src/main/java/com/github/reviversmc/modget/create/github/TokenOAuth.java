@@ -9,6 +9,7 @@ public interface TokenOAuth {
     /**
      * Creates an OAuthAccessToken, which can be used.
      * This token automatically overwrites any previous value in {@link TokenManager#getToken()}
+     *
      * @param oAuthVerifyCodePojo Can be obtained from {@link TokenOAuth#getOAuthVerifyCode()}
      * @return True if successful, false otherwise. The token can then be obtained by {@link TokenManager#getToken()}
      */
@@ -17,6 +18,7 @@ public interface TokenOAuth {
     /**
      * Gets the verification code, required by {@link TokenOAuth#createOAuthAccessToken(OAuthVerifyCodePojo)}
      * This method does not automatically display the verification code to the user.
+     *
      * @return The response by GitHub in POJO.
      */
     OAuthVerifyCodePojo getOAuthVerifyCode();

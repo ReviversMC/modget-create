@@ -26,8 +26,8 @@ public class VersionCommand implements Command {
             versionProperties.load(getClass().getClassLoader().getResourceAsStream("version.properties"));
             System.out.println(
                     colorize(
-                    "modget-create Version: " + versionProperties.getProperty("ModgetCreateVersion") + "\n" +
-                            "Supported modget Manifest Version: " + versionProperties.getProperty("ModgetManifestVersion"),
+                            "modget-create Version: " + versionProperties.getProperty("ModgetCreateVersion") + "\n" +
+                                    "Supported modget Manifest Version: " + versionProperties.getProperty("ModgetManifestVersion"),
                             Attribute.GREEN_TEXT()
                     )
             );
