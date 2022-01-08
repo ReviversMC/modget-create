@@ -34,7 +34,7 @@ public class CreateCommand implements Command {
     }
 
     @Override
-    public void onCommand(Map<String, Optional<String>> args) {
+    public void onCommand(Map<String, List<String>> args) {
 
         //All of these will definitely have a value, as they are mandatory values.
         Optional<String> optionalCurseforgeId = ArgObtainer.obtainFirst(args, List.of("-cf", "--curseforge"));
@@ -106,31 +106,45 @@ public class CreateCommand implements Command {
                 System.out.println(
                         colorize(
                                 "Your GitHub token is invalid! Please ensure that it has the " +
-                                        "\"public_repo\" scope.",
+                                        "\"public_repo\" scope as well.",
                                 Attribute.RED_TEXT()
                         )
                 );
                 return;
             }
         } else {
-            optionalToken = tokenManager.getToken();
-            if (optionalToken.isEmpty()) {
-                tokenOAuthGuider.guide();
+            if (optionalOutputFolder.isEmpty()) {
                 optionalToken = tokenManager.getToken();
-            }
+                if (optionalToken.isEmpty()) {
+                    tokenOAuthGuider.guide();
+                    optionalToken = tokenManager.getToken();
+                }
 
-            if (optionalToken.isPresent()) token = optionalToken.get();
-            else { //User rejected oAuth.
-                //No token, which is required.
+                if (optionalToken.isPresent()) token = optionalToken.get();
+                else { //User rejected oAuth.
+                    //No token, which is required.
+                    System.out.println(
+                            colorize(
+                                    "You have no valid GitHub token!" +
+                                            "Please try again with a GitHub token, " +
+                                            "or approve the authentication code when you are presented with it.",
+                                    Attribute.RED_TEXT()
+                            )
+                    );
+                    return;
+                }
+            } else {
+                token = null;
                 System.out.println(
                         colorize(
-                                "You have no valid GitHub token!" +
-                                        "Please try again with a GitHub token, " +
-                                        "or approve the authentication code when you are presented with it.",
-                                Attribute.RED_TEXT()
+                                "Warning: You are running modget-create unauthenticated! " +
+                                        "This means that you will not be able to use automatic PRs, " +
+                                        "and that you may be rate limited.\n" +
+                                        "If you are experiencing repeated failures with MGC, " +
+                                        "you may be rate limited.",
+                                Attribute.YELLOW_TEXT()
                         )
                 );
-                return;
             }
         }
 
@@ -142,7 +156,7 @@ public class CreateCommand implements Command {
                 modVersions,
                 updateAlternatives,
                 modStatus,
-                token,
+                token, //Null value is fine.
                 optionalCurseforgeId.get(),
                 optionalJarPath.get(),
                 optionalModrinthId.get(),

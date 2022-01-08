@@ -12,7 +12,7 @@ public interface ManifestCreatorFactory {
             @Assisted("modVersions") List<String> modVersions,
             @Assisted("updateAlternatives") List<String> updateAlternatives,
             ModStatus modStatus,
-            @Assisted("authToken") String authToken,
+            @Assisted("authToken") String authToken, //Null value is fine.
             @Assisted("curseId") String curseforgeId,
             @Assisted("modJarPath") String modJarPath,
             @Assisted("modrinthId") String modrinthId,
