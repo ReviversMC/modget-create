@@ -18,7 +18,7 @@ public class ExitCommand implements Command {
     }
 
     @Override
-    public void onCommand(Map<String, Optional<String>> args) {
+    public void onCommand(Map<String, List<String>> args) {
         System.out.println(
                 colorize(
                         "modget-create is shutting down...", Attribute.GREEN_TEXT()

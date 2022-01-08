@@ -32,17 +32,20 @@ public class MGCCommandManager implements CommandManager {
          */
         String[] splitCmd = commandWithParams.split(" ");
         String commandIssued = splitCmd[0];
-        HashMap<String, Optional<String>> args = new HashMap<>();
+        HashMap<String, List<String>> args = new HashMap<>();
 
         for (int x = 1; x < splitCmd.length; x++) {
 
             if (splitCmd[x].startsWith("-") || splitCmd[x].startsWith("--")) {
+
+                List<String> list = args.getOrDefault(splitCmd[x], new ArrayList<>());
+
                 if (x + 1 < splitCmd.length &&
                         !splitCmd[x + 1].startsWith("-") && !splitCmd[x + 1].startsWith("--")) {
-                    args.put(splitCmd[x], Optional.of(splitCmd[x + 1]));
-                } else {
-                    args.put(splitCmd[x], Optional.empty());
+                    list.add(splitCmd[x + 1]);
                 }
+
+                args.put(splitCmd[x], list);
             }
         }
 
@@ -64,8 +67,11 @@ public class MGCCommandManager implements CommandManager {
                             }
 
                             if (reqParamList.contains(param) &&
-                                    //Protect against required params with no value
-                                    args.getOrDefault(param, Optional.empty()).isPresent()) {
+                                    /*
+                                    Protect against required params with no value.
+                                    All required params should have value.
+                                     */
+                                    !args.getOrDefault(param, List.of()).isEmpty()) {
                                 found = true;
                                 break;
                             }

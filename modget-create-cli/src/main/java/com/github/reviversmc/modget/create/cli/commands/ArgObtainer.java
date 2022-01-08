@@ -18,10 +18,11 @@ public class ArgObtainer {
      * @param toObtain The arguments to find.
      * @return An {@link Optional} with a value if found, or an empty {@link Optional} otherwise.
      */
-    public static Optional<String> obtainFirst(Map<String, Optional<String>> args, List<String> toObtain) {
-        for (String attemptObtain : toObtain) {
-            Optional<String> value = args.getOrDefault(attemptObtain, Optional.empty());
-            if (value.isPresent()) return value;
+    public static Optional<String> obtainFirst(Map<String, List<String>> args, List<String> toObtain) {
+        for (Map.Entry<String, List<String>> attemptObtain : args.entrySet()) {
+            if (toObtain.contains(attemptObtain.getKey()))
+                return attemptObtain.getValue().isEmpty() ?
+                        Optional.empty() : Optional.of(attemptObtain.getValue().get(0));
         }
         return Optional.empty();
     }
@@ -33,11 +34,11 @@ public class ArgObtainer {
      * @param toObtain The arguments to find.
      * @return A list of all found values.
      */
-    public static List<String> obtainAll(Map<String, Optional<String>> args, List<String> toObtain) {
+    public static List<String> obtainAll(Map<String, List<String>> args, List<String> toObtain) {
         List<String> values = new ArrayList<>();
-        for (String attemptObtain : toObtain) {
-            Optional<String> value = args.getOrDefault(attemptObtain, Optional.empty());
-            value.ifPresent(values::add);
+        for (Map.Entry<String, List<String>> attemptObtain : args.entrySet()) {
+            if (toObtain.contains(attemptObtain.getKey()))
+                values.addAll(attemptObtain.getValue());
         }
         return values;
     }

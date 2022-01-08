@@ -4,11 +4,18 @@ import static com.diogonunes.jcolor.Ansi.colorize;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import com.diogonunes.jcolor.Attribute;
 
 public interface Command {
+
+    /**
+     * This function is called when the appropriate command is invoked.
+     *
+     * @param args A list of arguments (or parameters as it is referred to multiple times in modget-create)
+     *             that can be used.
+     */
+    void onCommand(Map<String, List<String>> args);
 
     /**
      * Gets all the names/aliases for the command.
@@ -43,14 +50,6 @@ public interface Command {
     default List<String> getOptionalParameters() {
         return List.of();
     }
-
-    /**
-     * This function is called when the appropriate command is invoked.
-     *
-     * @param args A list of arguments (or parameters as it is referred to multiple times in modget-create)
-     *             that can be used.
-     */
-    void onCommand(Map<String, Optional<String>> args);
 
     /**
      * Sends a help message for this command, which informs users of all available options.

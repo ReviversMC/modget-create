@@ -19,7 +19,7 @@ public class VersionCommand implements Command {
     }
 
     @Override
-    public void onCommand(Map<String, Optional<String>> args) {
+    public void onCommand(Map<String, List<String>> args) {
         Properties versionProperties = new Properties();
 
         try {

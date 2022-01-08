@@ -18,7 +18,7 @@ public class HelpCommand implements Command {
     }
 
     @Override
-    public void onCommand(Map<String, Optional<String>> args) {
+    public void onCommand(Map<String, List<String>> args) {
         System.out.println(
                 colorize(
                         "Displaying all available commands:\n" +
