@@ -59,10 +59,11 @@ public class ModrinthV1Query implements ModrinthQuery {
     }
 
     @Override
-    public Optional<ModrinthV1TeamMemberPojo[]> getTeamMembers() {
+    public ModrinthV1TeamMemberPojo[] getTeamMembers() {
         if (modExists()) {
+
             Optional<ModrinthV1ModPojo> optionalModPojo = getMod();
-            if (optionalModPojo.isEmpty()) return Optional.empty();
+            if (optionalModPojo.isEmpty()) return new ModrinthV1TeamMemberPojo[0];
 
             Request request = new Request.Builder()
                     .url("https://api.modrinth.com/api/v1/team/" +
@@ -76,25 +77,24 @@ public class ModrinthV1Query implements ModrinthQuery {
                 if (responseBody != null) {
                     String responseBodyString = responseBody.string();
                     response.close();
-                    return Optional.of(
-                            jsonMapper.readValue(responseBodyString, ModrinthV1TeamMemberPojo[].class)
-                    );
+                    return jsonMapper.readValue(responseBodyString, ModrinthV1TeamMemberPojo[].class);
+
                 }
 
             } catch (IOException ex) {
                 ex.printStackTrace();
             }
         }
-        return Optional.empty();
+        return new ModrinthV1TeamMemberPojo[0];
     }
 
     @Override
     public Optional<ModrinthV1UserPojo> getOwner() {
         if (modExists()) {
-            Optional<ModrinthV1TeamMemberPojo[]> optionalTeamMemberPojos = getTeamMembers();
-            if (optionalTeamMemberPojos.isEmpty()) return Optional.empty();
+            ModrinthV1TeamMemberPojo[] teamMemberPojos = getTeamMembers();
+            if (teamMemberPojos.length == 0) return Optional.empty();
 
-            for (ModrinthV1TeamMemberPojo teamMemberPojo : optionalTeamMemberPojos.get()) {
+            for (ModrinthV1TeamMemberPojo teamMemberPojo : teamMemberPojos) {
                 if (!teamMemberPojo.getRole().equalsIgnoreCase("Owner")) continue;
 
                 Request request = new Request.Builder()

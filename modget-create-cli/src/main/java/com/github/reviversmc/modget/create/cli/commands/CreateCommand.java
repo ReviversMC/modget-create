@@ -41,14 +41,14 @@ public class CreateCommand implements Command {
         Optional<String> optionalModrinthId = ArgObtainer.obtainFirst(args, List.of("-mr", "--modrinth"));
         Optional<String> optionalJarPath = ArgObtainer.obtainFirst(args, List.of("-j", "-jar", "--jar"));
         Optional<String> optionalStatus = ArgObtainer.obtainFirst(args, List.of("-s", "--status"));
-        Optional<List<String>> optionalModVersions = ArgObtainer.obtainAll(args, List.of("-v", "-ver", "--version"));
+        List<String> modVersions = ArgObtainer.obtainAll(args, List.of("-v", "-ver", "--version"));
         Optional<String> optionalWiki = ArgObtainer.obtainFirst(args, List.of("-w", "--wiki"));
 
         if (optionalCurseforgeId.isEmpty() ||
                 optionalModrinthId.isEmpty() ||
                 optionalJarPath.isEmpty() ||
                 optionalStatus.isEmpty() ||
-                optionalModVersions.isEmpty() ||
+                modVersions.isEmpty() ||
                 optionalWiki.isEmpty()
         ) { //Should never happen.
 
@@ -61,9 +61,22 @@ public class CreateCommand implements Command {
             return;
         }
 
+        ModStatus modStatus;
 
         try {
-            ModStatus modStatus = ModStatus.valueOf(optionalStatus.get().toUpperCase());
+            modStatus = ModStatus.valueOf(optionalStatus.get().toUpperCase());
+
+        } catch (IllegalArgumentException ex) {
+            System.out.println(
+                    colorize(
+                            "You provided an invalid mod status! (argument -s/--status) " +
+                                    "Please specify \"ABANDONED\", \"ACTIVE\", \"EOL\", or \"UNKNOWN\".",
+                            Attribute.RED_TEXT()
+                    )
+            );
+            return;
+        }
+
 
             //Start search for optional args
             Optional<String> optionalOutputFolder = ArgObtainer.obtainFirst(args, List.of("-o", "--output"));
@@ -97,6 +110,7 @@ public class CreateCommand implements Command {
                                     Attribute.RED_TEXT()
                             )
                     );
+                    return;
                 }
             } else {
                 optionalToken = tokenManager.getToken();
@@ -120,13 +134,13 @@ public class CreateCommand implements Command {
                 }
             }
 
-            Optional<List<String>> optionalUpdateAlternatives = ArgObtainer.obtainAll(
+            List<String> updateAlternatives = ArgObtainer.obtainAll(
                     args, List.of("-ua", "--update-alternatives")
             );
 
             ManifestCreator manifestCreator = manifestCreatorFactory.create(
-                    optionalModVersions.get(),
-                    optionalUpdateAlternatives.orElseGet(List::of),
+                    modVersions,
+                    updateAlternatives,
                     modStatus,
                     token,
                     optionalCurseforgeId.get(),
@@ -170,8 +184,9 @@ public class CreateCommand implements Command {
             }
 
             Optional<String> optionalMainManifest = manifestCreator.createMainYaml(forceRecreate);
+            Optional<String> optionalLookupTable = manifestCreator.createLookupTable(forceRecreate);
 
-            if (optionalMainManifest.isEmpty()) {
+            if (optionalMainManifest.isEmpty() || optionalLookupTable.isEmpty()) {
                 System.out.println(
                         colorize(
                                 "Something went wrong! Please try again.",
@@ -181,6 +196,7 @@ public class CreateCommand implements Command {
                 return;
             }
 
+        try {
             if (optionalOutputFolder.isPresent()) {
                 FileOutputStream mainYmlStream = new FileOutputStream(
                         outputFolder.getAbsolutePath() + File.separator + "main.yml"
@@ -189,14 +205,6 @@ public class CreateCommand implements Command {
                 mainYmlStream.close();
             }
 
-        } catch (IllegalArgumentException ex) {
-            System.out.println(
-                    colorize(
-                            "You provided an invalid mod status! (argument -s/--status) " +
-                                    "Please specify \"ABANDONED\", \"ACTIVE\", \"EOL\", or \"UNKNOWN\".",
-                            Attribute.RED_TEXT()
-                    )
-            );
         } catch (IOException ex) {
             ex.printStackTrace();
         }

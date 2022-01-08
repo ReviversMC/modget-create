@@ -29,14 +29,14 @@ public class ArgObtainer {
      * Obtain the first occurrence of the argument found.
      * @param args The list of arguments to check.
      * @param toObtain The arguments to find.
-     * @return An {@link Optional} with a list of values if found, or an empty {@link Optional} otherwise.
+     * @return A list of all found values.
      */
-    public static Optional<List<String>> obtainAll(Map<String, Optional<String>> args, List<String> toObtain) {
+    public static List<String> obtainAll(Map<String, Optional<String>> args, List<String> toObtain) {
         List<String> values = new ArrayList<>();
         for (String attemptObtain : toObtain) {
             Optional<String> value = args.getOrDefault(attemptObtain, Optional.empty());
             value.ifPresent(values::add);
         }
-        return values.isEmpty() ? Optional.empty() : Optional.of(values);
+        return values;
     }
 }

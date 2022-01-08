@@ -19,10 +19,10 @@ public interface ModrinthQuery {
     /**
      * Gets team members of the team which created the mod specified in this class.
      *
-     * @return A {@link Optional} <{@link ModrinthV1TeamMemberPojo}[]>,
-     * if the mod exists, or an empty {@link Optional} otherwise.
+     * @return An array of {@link ModrinthV1TeamMemberPojo},
+     * if the mod exists, or an empty array otherwise of {@link ModrinthV1TeamMemberPojo} otherwise.
      */
-    Optional<ModrinthV1TeamMemberPojo[]> getTeamMembers();
+    ModrinthV1TeamMemberPojo[] getTeamMembers();
 
     /**
      * Gets the owner of this mod.
