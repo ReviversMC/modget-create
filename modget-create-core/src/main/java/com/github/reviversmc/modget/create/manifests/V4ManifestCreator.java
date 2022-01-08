@@ -19,7 +19,7 @@ import dagger.assisted.AssistedInject;
 import okhttp3.*;
 import org.kohsuke.github.GitHub;
 import org.kohsuke.github.GitHubBuilder;
-import org.kohsuke.github.extras.okhttp3.OkHttpGitHubConnector;
+import org.kohsuke.github.connector.GitHubConnector;
 
 import javax.inject.Named;
 import java.io.*;
@@ -40,29 +40,27 @@ public class V4ManifestCreator implements ManifestCreator {
     private final ModrinthQuery modrinthQuery;
     private final ModStatus modStatus;
     private final RepoManager repoManager;
-    private final String authToken; //Allow for use of custom token.
     private final String wiki;
-    private final OkHttpClient okHttpClient;
     private final ObjectMapper yamlMapper;
 
     private final boolean isUsable;
 
     @AssistedInject
     public V4ManifestCreator(
+            GitHubConnector gitHubConnector,
             @Assisted("modVersions") List<String> modVersions,
             @Assisted("updateAlternatives") List<String> updateAlternatives,
             ManifestV4MainPojo manifestV4MainPojo,
             ModrinthQueryFactory modrinthQueryFactory,
             @Assisted ModStatus modStatus,
             RepoManager repoManager,
-            @Assisted("authToken") String authToken,
+            @Assisted("authToken") String authToken, //Null value is fine.
             @Assisted("curseId") String curseforgeId,
             @Assisted("modJarPath") String modJarPath,
             @Assisted("modrinthId") String modrinthId,
             @Assisted("wiki") String wiki,
             @Named("json") ObjectMapper jsonMapper,
-            @Named("yaml") ObjectMapper yamlMapper,
-            OkHttpClient okHttpClient
+            @Named("yaml") ObjectMapper yamlMapper
     ) {
         this.modVersions = modVersions;
         this.updateAlternatives = updateAlternatives;
@@ -70,20 +68,18 @@ public class V4ManifestCreator implements ManifestCreator {
         this.modrinthQuery = modrinthQueryFactory.create(modrinthId);
         this.modStatus = modStatus;
         this.repoManager = repoManager;
-        this.authToken = authToken;
         this.wiki = wiki;
+        this.yamlMapper = yamlMapper;
 
         Properties authProperties = new Properties();
-        authProperties.setProperty("oauth", authToken);
+        if (authToken != null)
+            authProperties.setProperty("oauth", authToken);
 
         GitHub tempGithubAPI;
         try {
             tempGithubAPI = GitHubBuilder.fromProperties(authProperties)
-                    .withConnector(
-                            new OkHttpGitHubConnector(
-                                    okHttpClient
-                            )
-                    ).build();
+                    .withConnector(gitHubConnector)
+                    .build();
 
         } catch (IOException ex) {
             ex.printStackTrace();
@@ -92,16 +88,16 @@ public class V4ManifestCreator implements ManifestCreator {
 
         this.githubAPI = tempGithubAPI;
 
+
         int tempCurseforgeId = -1;
         try {
             tempCurseforgeId = Integer.parseInt(curseforgeId);
         } catch (NumberFormatException ex) {
             ex.printStackTrace();
         }
+
         this.curseforgeId = tempCurseforgeId;
 
-        this.okHttpClient = okHttpClient;
-        this.yamlMapper = yamlMapper;
 
         if (modJarPath.startsWith("\"") || modJarPath.startsWith("'")) {
             modJarPath = modJarPath.substring(1);
@@ -141,7 +137,7 @@ public class V4ManifestCreator implements ManifestCreator {
 
     @Override
     public Optional<String> createLookupTable(boolean forceCreate) {
-        return Optional.empty();
+        return Optional.of("");
     }
 
     @Override
@@ -243,6 +239,7 @@ public class V4ManifestCreator implements ManifestCreator {
         manifestV4MainPojo.setWiki(wiki);
 
         ManifestV4MainPojo.Chats chats = new ManifestV4MainPojo.Chats();
+        chats.setDiscord("~"); //Can be changed later, if a value is found.
         chats.setIrc(modPojo.getContact().getIrc());
 
         List<ManifestV4MainPojo.Chats.MiscChat> miscChats = new ArrayList<>();
@@ -273,9 +270,12 @@ public class V4ManifestCreator implements ManifestCreator {
             manifestV4MainPojo.setSupport(manifestV4MainPojo.getChats().getDiscord());
         else if (!manifestV4MainPojo.getChats().getIrc().equalsIgnoreCase("~"))
             manifestV4MainPojo.setSupport(manifestV4MainPojo.getChats().getIrc());
-        else if (manifestV4MainPojo.getChats().getOthers().length != 0)
+        else if (manifestV4MainPojo.getChats().getOthers() != null &&
+                manifestV4MainPojo.getChats().getOthers().length != 0) {
+
             manifestV4MainPojo.setSupport(manifestV4MainPojo.getChats().getOthers()[0].getUrl());
-        else manifestV4MainPojo.setSupport(manifestV4MainPojo.getIssues()); //Automatically Tilde if NA.
+
+        } else manifestV4MainPojo.setSupport(manifestV4MainPojo.getIssues()); //Automatically Tilde if NA.
 
         List<ManifestV4MainPojo.Version> modVersionList = new ArrayList<>();
         for (String modVersionCandidate : modVersions) {

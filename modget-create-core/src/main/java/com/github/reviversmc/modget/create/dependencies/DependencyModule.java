@@ -11,6 +11,8 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLParser;
 import dagger.Module;
 import dagger.Provides;
 import okhttp3.OkHttpClient;
+import org.kohsuke.github.connector.GitHubConnector;
+import org.kohsuke.github.extras.okhttp3.OkHttpGitHubConnector;
 
 @Module
 public interface DependencyModule {
@@ -26,6 +28,12 @@ public interface DependencyModule {
     @Singleton
     static OkHttpClient okhttpClient() {
         return new OkHttpClient.Builder().build();
+    }
+
+    @Provides
+    @Singleton
+    static GitHubConnector okhttpGithubConnector(OkHttpClient okHttpClient) {
+        return new OkHttpGitHubConnector(okHttpClient);
     }
 
     @Named("yaml")

@@ -3,7 +3,7 @@ plugins {
     id "com.github.johnrengelman.shadow" version "7.1.2"
 }
 
-group = project.maven_group
+group = project.maven_group.toString()
 version = project.version
 
 subprojects {
@@ -48,6 +48,7 @@ subprojects {
         implementation "com.squareup.okhttp3:okhttp:${project.okhttp3_version}"
         implementation "com.squareup.okhttp3:okhttp-urlconnection:${project.okhttp3_version}"
         implementation "org.fusesource.jansi:jansi:${project.jansi_version}"
+        implementation "org.kohsuke:github-api:${project.github_api_version}"
         implementation "org.jline:jline:${project.jline_version}"
 
         // JUnit Jupiter for testing
@@ -55,7 +56,6 @@ subprojects {
 
         compileOnly "com.github.spotbugs:spotbugs:${project.spotbugs_version}"
     }
-
 
     compileJava {
         options.encoding "UTF-8"

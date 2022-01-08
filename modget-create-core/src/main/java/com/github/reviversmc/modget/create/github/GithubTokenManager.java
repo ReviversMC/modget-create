@@ -1,9 +1,9 @@
 package com.github.reviversmc.modget.create.github;
 
 
-import okhttp3.OkHttpClient;
+import org.kohsuke.github.GitHub;
 import org.kohsuke.github.GitHubBuilder;
-import org.kohsuke.github.extras.okhttp3.OkHttpGitHubConnector;
+import org.kohsuke.github.connector.GitHubConnector;
 
 import java.io.IOException;
 import java.util.Optional;
@@ -15,12 +15,12 @@ import javax.inject.Singleton;
 @Singleton
 public class GithubTokenManager implements TokenManager {
 
-    private final OkHttpClient okHttpClient;
+    private final GitHubConnector gitHubConnector;
     private String githubToken;
 
     @Inject
-    public GithubTokenManager(OkHttpClient okHttpClient) {
-        this.okHttpClient = okHttpClient;
+    public GithubTokenManager(GitHubConnector gitHubConnector) {
+        this.gitHubConnector = gitHubConnector;
     }
 
     @Override
@@ -45,13 +45,10 @@ public class GithubTokenManager implements TokenManager {
         authProperties.setProperty("oauth", token);
 
         try {
-            return GitHubBuilder.fromProperties(authProperties)
-                    .withConnector(
-                            new OkHttpGitHubConnector(
-                                    okHttpClient
-                            )
-                    ).build()
-                    .isCredentialValid();
+            GitHub githubAPI =  GitHubBuilder.fromProperties(authProperties)
+                    .withConnector(gitHubConnector).build();
+
+            return githubAPI.isCredentialValid() && githubAPI.getRateLimit().getRemaining() > 0;
 
         } catch (IOException ex) {
             ex.printStackTrace();
