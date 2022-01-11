@@ -28,7 +28,7 @@ import java.net.URLClassLoader;
 import java.util.*;
 
 public class V4ManifestCreator implements ManifestCreator {
-    private final FabricModPojo modPojo;
+    private final FabricV1ModPojo modPojo;
     private final GitHub githubAPI;
     private final int curseforgeId;
     private final List<String> modVersions;
@@ -105,7 +105,7 @@ public class V4ManifestCreator implements ManifestCreator {
         }
 
         File mod = new File(modJarPath);
-        FabricModPojo tempModPojo = null;
+        FabricV1ModPojo tempModPojo = null;
         if (mod.exists() && modJarPath.toLowerCase().endsWith(".jar")) {
             try {
                 URLClassLoader classLoader = new URLClassLoader(new URL[]{mod.toURI().toURL()});
@@ -113,7 +113,7 @@ public class V4ManifestCreator implements ManifestCreator {
 
                 if (modJsonStream != null) {
                     tempModPojo =
-                            jsonMapper.readValue(modJsonStream, FabricModPojo.class);
+                            jsonMapper.readValue(modJsonStream, FabricV1ModPojo.class);
                 }
             } catch (IOException ex) {
                 ex.printStackTrace();
@@ -193,30 +193,24 @@ public class V4ManifestCreator implements ManifestCreator {
             if (!alternateNames.contains(altName)) alternateNames.add(altName);
         });
 
-        if (alternateNames.isEmpty()) modEntry.setAlternativeNames(new String[]{"~"});
-        else modEntry.setAlternativeNames(alternateNames.toArray(new String[0]));
+        modEntry.setAlternativeNames(alternateNames.toArray(new String[0]));
 
 
-        ManifestV4LookupTablePojo[] editedManifestV4LookupTablePojos
-                = new ManifestV4LookupTablePojo[manifestV4LookupTablePojos.length + 1];
+        List<ManifestV4LookupTablePojo> editedLookupTablePojoList = new ArrayList<>();
 
-        for (int x = 0; x < manifestV4LookupTablePojos.length; x++) {
+
+        for (ManifestV4LookupTablePojo manifestV4LookupTablePojo : manifestV4LookupTablePojos) {
 
             //Replace the entry that we are overriding, if applicable.
-            if (forceCreate &&
-                    manifestV4LookupTablePojos[x].getId().equalsIgnoreCase(modEntry.getId())) continue;
+            if (forceCreate && manifestV4LookupTablePojo.getId().equalsIgnoreCase(modEntry.getId())) continue;
 
-            if (x != 0 && editedManifestV4LookupTablePojos[x] == null)
-                editedManifestV4LookupTablePojos[x - 1] = manifestV4LookupTablePojos[x];
-            else
-                editedManifestV4LookupTablePojos[x] = manifestV4LookupTablePojos[x];
+            editedLookupTablePojoList.add(manifestV4LookupTablePojo);
         }
 
-        editedManifestV4LookupTablePojos[editedManifestV4LookupTablePojos.length - 1] = modEntry;
-
+        editedLookupTablePojoList.add(modEntry);
 
         return Optional.of(
-                yamlMapper.writeValueAsString(editedManifestV4LookupTablePojos)
+                yamlMapper.writeValueAsString(editedLookupTablePojoList.toArray(new ManifestV4LookupTablePojo[0]))
                         /*
                         Make it so that Tilde is never in quotes, but all other strings are.
                         Example format:
@@ -225,6 +219,7 @@ public class V4ManifestCreator implements ManifestCreator {
                         fieldB: ~
                         */
                         .replace(": \"~\"", ": ~")
+                    .replace(": []", ": ~")
         );
 
     }
@@ -336,8 +331,7 @@ public class V4ManifestCreator implements ManifestCreator {
                 }
         );
 
-        if (!miscChats.isEmpty()) chats.setOthers(miscChats.toArray(new ManifestV4MainPojo.Chats.MiscChat[0]));
-        else chats.setOthers(null); //Will be fixed later, through String#replace.
+        chats.setOthers(miscChats.toArray(new ManifestV4MainPojo.Chats.MiscChat[0]));
 
         if (modrinthFound) {
             if (optionalModrinthV1ModPojo.get().getDiscordUrl().isPresent())
@@ -377,9 +371,7 @@ public class V4ManifestCreator implements ManifestCreator {
                         fieldB: ~
                         */
                         .replace(": \"~\"", ": ~")
-
-                        //Fix issue of chats.others being represented incorrectly as null.
-                        .replace("others: null", "others: ~")
+                        .replace(": []", ": ~")
         );
 
     }
