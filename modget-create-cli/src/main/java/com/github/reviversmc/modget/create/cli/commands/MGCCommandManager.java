@@ -66,12 +66,7 @@ public class MGCCommandManager implements CommandManager {
                                 return;
                             }
 
-                            if (reqParamList.contains(param) &&
-                                    /*
-                                    Protect against required params with no value.
-                                    All required params should have value.
-                                     */
-                                    !args.getOrDefault(param, List.of()).isEmpty()) {
+                            if (reqParamList.contains(param)) {
                                 found = true;
                                 break;
                             }
