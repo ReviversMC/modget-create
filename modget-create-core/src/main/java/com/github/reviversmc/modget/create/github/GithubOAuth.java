@@ -28,7 +28,8 @@ public class GithubOAuth implements TokenOAuth {
     }
 
     @Override
-    public boolean createOAuthAccessToken(OAuthVerifyCodePojo oAuthVerifyCodePojo) {
+    public boolean createOAuthAccessToken(OAuthVerifyCodePojo oAuthVerifyCodePojo)
+            throws InterruptedException, IOException {
         //String oAuthDeviceId = oAuthVerifyCodeJson.getDeviceCode();
 
         RequestBody accessTokenRequestBody = new FormBody.Builder()
@@ -43,46 +44,42 @@ public class GithubOAuth implements TokenOAuth {
                 .url("https://github.com/login/oauth/access_token")
                 .build();
 
-        try {
-            while (true) {
-                //noinspection BusyWait, expected behaviour
-                Thread.sleep(oAuthVerifyCodePojo.getInterval() * 1000L + 1000L);
 
-                Response accessTokenResponse = okHttpClient.newCall(accessTokenRequest).execute();
+        while (true) {
+            //noinspection BusyWait, expected behaviour
+            Thread.sleep(oAuthVerifyCodePojo.getInterval() * 1000L + 1000L);
 
-                OAuthAccessTokenPojo accessTokenPojo = jsonMapper.readValue(
-                        Objects.requireNonNull(accessTokenResponse.body()).string(),
-                        OAuthAccessTokenPojo.class
-                );
+            Response accessTokenResponse = okHttpClient.newCall(accessTokenRequest).execute();
 
-                accessTokenResponse.close();
+            OAuthAccessTokenPojo accessTokenPojo = jsonMapper.readValue(
+                    Objects.requireNonNull(accessTokenResponse.body()).string(),
+                    OAuthAccessTokenPojo.class
+            );
 
-                if (accessTokenPojo.getError() != null) {
+            accessTokenResponse.close();
 
-                    switch (accessTokenPojo.getError()) {
-                        case "slow_down":
-                            //noinspection BusyWait, expected behaviour.
-                            Thread.sleep(5500L);
-                        case "expired_token":
-                            //Not checking for unsupported_grant_type.
-                        case "access_denied":
-                            return false;
+            if (accessTokenPojo.getError() != null) {
 
-                        default:
-                            continue;
-                    }
+                switch (accessTokenPojo.getError()) {
+                    case "slow_down":
+                        //noinspection BusyWait, expected behaviour.
+                        Thread.sleep(5500L);
+                    case "expired_token":
+                        //Not checking for unsupported_grant_type.
+                    case "access_denied":
+                        return false;
+
+                    default:
+                        continue;
                 }
-                //Should always return true, unless the user's internet suddenly cuts or something unexpected happens.
-                return tokenManager.setToken(accessTokenPojo.getAccessToken());
             }
-        } catch (InterruptedException | IOException ex) {
-            ex.printStackTrace();
+            //Should always return true, unless the user's internet suddenly cuts or something unexpected happens.
+            return tokenManager.setToken(accessTokenPojo.getAccessToken());
         }
-        return false;
     }
 
     @Override
-    public OAuthVerifyCodePojo getOAuthVerifyCode() {
+    public OAuthVerifyCodePojo getOAuthVerifyCode() throws IOException {
         RequestBody verifyCodeRequestBody = new FormBody.Builder()
                 .add("client_id", clientId)
                 .add("scope", "public_repo")
@@ -94,21 +91,15 @@ public class GithubOAuth implements TokenOAuth {
                 .url("https://github.com/login/device/code")
                 .build();
 
-        try {
-            Response verifyCodeResponse = okHttpClient.newCall(verifyCodeRequest).execute();
 
-            OAuthVerifyCodePojo oAuthVerifyCodePojo = jsonMapper.readValue(
-                    Objects.requireNonNull(verifyCodeResponse.body()).string(),
-                    OAuthVerifyCodePojo.class
-            );
-            verifyCodeResponse.close();
-            return oAuthVerifyCodePojo;
+        Response verifyCodeResponse = okHttpClient.newCall(verifyCodeRequest).execute();
 
-        } catch (IOException ex) {
-            ex.printStackTrace();
-            OAuthVerifyCodePojo fakeVerifyCodePojo = new OAuthVerifyCodePojo();
-            fakeVerifyCodePojo.setError(ex.getMessage());
-            return fakeVerifyCodePojo;
-        }
+        OAuthVerifyCodePojo oAuthVerifyCodePojo = jsonMapper.readValue(
+                Objects.requireNonNull(verifyCodeResponse.body()).string(),
+                OAuthVerifyCodePojo.class
+        );
+        verifyCodeResponse.close();
+        return oAuthVerifyCodePojo;
+
     }
 }
