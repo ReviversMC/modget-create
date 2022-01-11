@@ -79,9 +79,10 @@ public class LoginCommand implements Command {
     @Override
     public String getDescription() {
         return "This command allows a user to authenticate with GitHub," +
-                " which is needed for automatic PRs of manifests.\n" +
+                " which is needed for automatic PRs of manifests.\n\n" +
                 "Parameters definitions:\n" +
-                "-t <token>, --token <token>: Authenticate with a Personal Access Token, which is forgotten on shutdown.";
+                "-t, --token <token>    Authenticate with a GitHub Personal Access Token, " +
+                "which is forgotten on shutdown.";
     }
 
     @Override

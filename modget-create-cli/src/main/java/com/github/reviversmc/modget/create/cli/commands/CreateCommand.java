@@ -205,13 +205,13 @@ public class CreateCommand implements Command {
 
 
         //Start search for optional args
-        Optional<String> optionalOutputFolder = ArgObtainer.obtainFirst(args, List.of("-o", "--output"));
-        File outputFolder = null;
+        Optional<String> optionalUserSpecifiedOutputFolder = ArgObtainer.obtainFirst(args, List.of("-o", "--output"));
+        File userSpecifiedOutputFolder = null;
 
-        if (optionalOutputFolder.isPresent()) {
-            outputFolder = new File(optionalOutputFolder.get());
+        if (optionalUserSpecifiedOutputFolder.isPresent()) {
+            userSpecifiedOutputFolder = new File(optionalUserSpecifiedOutputFolder.get());
 
-            if (!outputFolder.exists() || !outputFolder.isDirectory()) {
+            if (!userSpecifiedOutputFolder.exists() || !userSpecifiedOutputFolder.isDirectory()) {
                 System.out.println(
                         colorize(
                                 "The provided output directory is invalid!\n" +
@@ -244,7 +244,7 @@ public class CreateCommand implements Command {
                 return;
             }
         } else {
-            if (optionalOutputFolder.isEmpty()) {
+            if (optionalUserSpecifiedOutputFolder.isEmpty()) {
                 optionalToken = tokenManager.getToken();
                 if (optionalToken.isEmpty()) {
                     tokenOAuthGuider.guide();
@@ -355,18 +355,22 @@ public class CreateCommand implements Command {
         }
 
         try {
-            if (optionalOutputFolder.isPresent()) {
+            if (optionalUserSpecifiedOutputFolder.isPresent()) {
+                String modId = manifestCreator.getModId().orElseThrow();
+                File modOutputFolder = new File(userSpecifiedOutputFolder + File.separator + modId);
                 FileOutputStream mainYmlStream = new FileOutputStream(
-                        outputFolder.getAbsolutePath() + File.separator + "main.yml"
+                        modOutputFolder.getAbsolutePath() + File.separator + "main.yml"
                 );
                 mainYmlStream.write(optionalMainManifest.get().getBytes(StandardCharsets.UTF_8));
                 mainYmlStream.close();
 
                 FileOutputStream lookupTableStream = new FileOutputStream(
-                        outputFolder.getAbsolutePath() + File.separator + "lookup-table.yaml"
+                        modOutputFolder.getAbsolutePath() + File.separator + "lookup-table.yaml"
                 );
                 lookupTableStream.write(optionalLookupTable.get().getBytes(StandardCharsets.UTF_8));
                 lookupTableStream.close();
+            } else {
+                //TODO(The automatic PR function is not yet complete! Please specify an output folder for the time being.)
             }
 
         } catch (IOException ex) {
@@ -383,12 +387,27 @@ public class CreateCommand implements Command {
     public String getDescription() {
         return "This command creates all the files necessary for a new manifest.\n" +
                 "Parameter definitions:\n" +
-                "-cf <id>, --curseforge <id>: The Curseforge id of the mod your wish to create a manifest for. " +
+                "-cf, --curseforge <id>:        The Curseforge id of the mod your wish to create a manifest for. " +
                 "Pass without value if Not Applicable.\n" +
-                "-j <path/to/mod>, -jar <path/to/mod>, --jar <path/to/mod>: The path to the mod you wish" +
+                "-force, --force-recreate:      Whether to force the recreation of manifests " +
+                "for mods that already have submitted manifests. No values accepted.\n" +
+                "-j, -jar, --jar <path/to/mod>: The path to the mod you wish" +
                 "to create a manifest for. You can drag and drop the mod onto your terminal.\n" +
-                "-mr <id/slug>, --modrinth <id/slug>: The Modrinth id/slug of the mod " +
-                "you wish to create a manifest for. Pass without value if Not Applicable.";
+                "-mr, --modrinth <id/slug>:     The Modrinth id/slug of the mod " +
+                "you wish to create a manifest for. Pass without value if Not Applicable.\n" +
+                "-o, --output <path/to/folder>: The output folder where this command should create the " +
+                "appropriate files. A subfolder will be created for the mod. " +
+                "Do NOT use if you want automatic PRs\n" +
+                "-s, --status (abandoned/active/eol/unknown): The status of the mod, " +
+                "as specified by the 4 options.\n" +
+                "-t, --token <token>:           Use a GitHub Personal Access Token instead of " +
+                "the token cached by modget-create\n" +
+                "-ua, --update-alternatives <package>: The package of an update alternative to this mod, " +
+                "if it is discontinued. You can use this parameter multiple times.\n" +
+                "-v, -ver, --version <mod version>: A version of this mod that exists. " +
+                "You can use this parameter multiple times. " +
+                "Please use this parameter to specify all versions of this mod.\n" +
+                "-w, --wiki <wiki site>:        The wiki site for the mod.";
     }
 
     @Override
