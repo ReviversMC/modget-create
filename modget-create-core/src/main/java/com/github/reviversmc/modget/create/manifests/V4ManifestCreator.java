@@ -127,6 +127,31 @@ public class V4ManifestCreator implements ManifestCreator {
 
     }
 
+    /**
+     * Cross-references the mod id in its mod.fabric.json with the nameCandidate given.
+     *
+     * @param nameCandidate The name to cross-reference with.
+     * @return The kebab-cased name if it is different.
+     */
+    private Optional<String> createAlternateName(String nameCandidate) {
+        String alphaNumericName = nameCandidate.replaceAll("[^A-Za-z0-9]", "");
+
+        /*
+          If alphaNumericName is "GoodMod" and id is "goodmod", we need to create alt name of "good-mod".
+          However, this can create false positives.
+          If the alphaNumericName is "Mod" and the id is "mod", a false positive alt name "mod" will be created.
+         */
+        if (!nameCandidate.equals(modPojo.getId())) {
+            String kebabCasedName = alphaNumericName
+                    .replaceAll("(?<=[a-z])([A-Z])", "-$1") //Turns "ModName" into "Mod-Name"
+                    .toLowerCase();
+
+            if (!modPojo.getId().equals(kebabCasedName)) //Filter out false positives.
+                return Optional.of(kebabCasedName);
+        }
+        return Optional.empty();
+    }
+
     @Override
     public Optional<String> createLookupTable() throws CurseException, IOException {
         return createLookupTable(false);
@@ -152,29 +177,24 @@ public class V4ManifestCreator implements ManifestCreator {
         //TODO Fill in Alt names, Packages, and Tags.
         List<String> alternateNames = new ArrayList<>();
 
-        String alphaNumericName = modPojo.getName().replaceAll("[^A-Za-z0-9]", "");
+        createAlternateName(modPojo.getName()).ifPresent(alternateNames::add); //No value alr in alt name list.
 
-        /*
-          If alphaNumericName is "GoodMod" and id is "goodmod", we need to create alt name of "good-mod".
-          However, this can create false positives.
-          If the alphaNumericName is "Mod" and the id is "mod", a false positive alt name "mod" will be created.
-         */
-        if (!alphaNumericName.equals(modPojo.getId())) {
-            String kebabCasedName = alphaNumericName
-                    .replaceAll("(?<=[a-z])([A-Z])", "-$1") //Turns "ModName" into "Mod-Name"
-                    .toLowerCase();
-
-            if (!modPojo.getId().equals(kebabCasedName)) //Filter out false positives.
-                alternateNames.add(kebabCasedName);
-        }
 
         Optional<CurseProject> optionalCurseProject = CurseAPI.project(curseforgeId);
-        boolean curseforgeFound = optionalCurseProject.isPresent();
-
-
-        boolean modrinthFound = modrinthQuery.modExists();
         Optional<ModrinthV1ModPojo> optionalModrinthV1ModPojo = modrinthQuery.getMod();
-        if (modrinthFound && optionalModrinthV1ModPojo.isEmpty()) return Optional.empty(); //Should never happen.
+
+        optionalCurseProject.flatMap(curseProject ->
+                createAlternateName(curseProject.name())).ifPresent(altName -> {
+            if (!alternateNames.contains(altName)) alternateNames.add(altName);
+        });
+
+        optionalModrinthV1ModPojo.flatMap(modrinthV1ModPojo ->
+                createAlternateName(modrinthV1ModPojo.getTitle())).ifPresent(altName -> {
+            if (!alternateNames.contains(altName)) alternateNames.add(altName);
+        });
+
+        if (alternateNames.isEmpty()) modEntry.setAlternativeNames(new String[]{"~"});
+        else modEntry.setAlternativeNames(alternateNames.toArray(new String[0]));
 
 
         ManifestV4LookupTablePojo[] editedManifestV4LookupTablePojos
@@ -197,6 +217,14 @@ public class V4ManifestCreator implements ManifestCreator {
 
         return Optional.of(
                 yamlMapper.writeValueAsString(editedManifestV4LookupTablePojos)
+                        /*
+                        Make it so that Tilde is never in quotes, but all other strings are.
+                        Example format:
+
+                        fieldA: "some value"
+                        fieldB: ~
+                        */
+                        .replace(": \"~\"", ": ~")
         );
 
     }
