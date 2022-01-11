@@ -307,26 +307,30 @@ public class CreateCommand implements Command {
 
         boolean forceRecreate = args.containsKey("-force") || args.containsKey("--force-recreate");
 
-        if (forceRecreate) {
-            System.out.println(
-                    colorize(
-                            "Warning: You are creating a manifest for mod that already has a manifest!",
-                            Attribute.YELLOW_TEXT()
-                    )
-            );
-        }
-
         try {
-            if (manifestCreator.isModPresent() && !forceRecreate) {
-                System.out.println(
-                        colorize(
-                                "Thanks for wanting to contribute, but the manifest for this mod already exists," +
-                                        " or is currently being PR-ed by someone else!\n" +
-                                        "Cancelling operation...",
-                                Attribute.YELLOW_TEXT()
-                        )
-                );
-                return;
+            if (manifestCreator.isModPresent()) {
+
+                if (forceRecreate) {
+                    System.out.println(
+                            colorize(
+                                    "Warning: You are creating a manifest for mod that already has a manifest!",
+                                    Attribute.YELLOW_TEXT()
+                            )
+                    );
+                } else {
+
+                    System.out.println(
+                            colorize(
+                                    "Thanks for wanting to contribute, but the manifest for this mod already exists," +
+                                            " or is currently being PR-ed by someone else!\n" +
+                                            "If you would like to create a manifest anyway, " +
+                                            "add the parameter \"-force/--force-recreate\"." +
+                                            "Cancelling operation...",
+                                    Attribute.RED_TEXT()
+                            )
+                    );
+                    return;
+                }
             }
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -390,7 +394,14 @@ public class CreateCommand implements Command {
                         )
                 );
             } else {
-                //TODO(The automatic PR function is not yet complete! Please specify an output folder for the time being.)
+                //TODO Add auto PR.
+                System.out.println(
+                        colorize(
+                                "The automatic PR function is not yet complete!" +
+                                        " Please specify an output folder for the time being.",
+                                Attribute.RED_TEXT()
+                        )
+                );
             }
 
         } catch (IOException ex) {
