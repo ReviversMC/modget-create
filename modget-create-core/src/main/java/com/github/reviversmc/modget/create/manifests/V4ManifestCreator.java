@@ -25,10 +25,7 @@ import javax.inject.Named;
 import java.io.*;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Properties;
+import java.util.*;
 
 public class V4ManifestCreator implements ManifestCreator {
     private final FabricModPojo modPojo;
@@ -131,22 +128,86 @@ public class V4ManifestCreator implements ManifestCreator {
     }
 
     @Override
-    public Optional<String> createLookupTable() {
+    public Optional<String> createLookupTable() throws CurseException, IOException {
         return createLookupTable(false);
     }
 
     @Override
-    public Optional<String> createLookupTable(boolean forceCreate) {
-        return Optional.of("");
+    public Optional<String> createLookupTable(boolean forceCreate) throws CurseException, IOException {
+
+        ManifestV4LookupTablePojo[] manifestV4LookupTablePojos;
+
+
+        InputStream lookupTableStream = githubAPI.getRepository("ReviversMc/modget-manifests")
+                .getFileContent("lookup-table.yaml")
+                .read();
+
+        manifestV4LookupTablePojos =
+                yamlMapper.readValue(lookupTableStream, ManifestV4LookupTablePojo[].class);
+
+
+        ManifestV4LookupTablePojo modEntry = new ManifestV4LookupTablePojo();
+        modEntry.setId(modPojo.getId().toLowerCase());
+
+        //TODO Fill in Alt names, Packages, and Tags.
+        List<String> alternateNames = new ArrayList<>();
+
+        String alphaNumericName = modPojo.getName().replaceAll("[^A-Za-z0-9]", "");
+
+        /*
+          If alphaNumericName is "GoodMod" and id is "goodmod", we need to create alt name of "good-mod".
+          However, this can create false positives.
+          If the alphaNumericName is "Mod" and the id is "mod", a false positive alt name "mod" will be created.
+         */
+        if (!alphaNumericName.equals(modPojo.getId())) {
+            String kebabCasedName = alphaNumericName
+                    .replaceAll("(?<=[a-z])([A-Z])", "-$1") //Turns "ModName" into "Mod-Name"
+                    .toLowerCase();
+
+            if (!modPojo.getId().equals(kebabCasedName)) //Filter out false positives.
+                alternateNames.add(kebabCasedName);
+        }
+
+        Optional<CurseProject> optionalCurseProject = CurseAPI.project(curseforgeId);
+        boolean curseforgeFound = optionalCurseProject.isPresent();
+
+
+        boolean modrinthFound = modrinthQuery.modExists();
+        Optional<ModrinthV1ModPojo> optionalModrinthV1ModPojo = modrinthQuery.getMod();
+        if (modrinthFound && optionalModrinthV1ModPojo.isEmpty()) return Optional.empty(); //Should never happen.
+
+
+        ManifestV4LookupTablePojo[] editedManifestV4LookupTablePojos
+                = new ManifestV4LookupTablePojo[manifestV4LookupTablePojos.length + 1];
+
+        for (int x = 0; x < manifestV4LookupTablePojos.length; x++) {
+
+            //Replace the entry that we are overriding, if applicable.
+            if (forceCreate &&
+                    manifestV4LookupTablePojos[x].getId().equalsIgnoreCase(modEntry.getId())) continue;
+
+            if (x != 0 && editedManifestV4LookupTablePojos[x] == null)
+                editedManifestV4LookupTablePojos[x - 1] = manifestV4LookupTablePojos[x];
+            else
+                editedManifestV4LookupTablePojos[x] = manifestV4LookupTablePojos[x];
+        }
+
+        editedManifestV4LookupTablePojos[editedManifestV4LookupTablePojos.length - 1] = modEntry;
+
+
+        return Optional.of(
+                yamlMapper.writeValueAsString(editedManifestV4LookupTablePojos)
+        );
+
     }
 
     @Override
-    public Optional<String> createMainYaml() {
+    public Optional<String> createMainYaml() throws Exception {
         return createMainYaml(false);
     }
 
     @Override
-    public Optional<String> createMainYaml(boolean forceCreate) {
+    public Optional<String> createMainYaml(boolean forceCreate) throws Exception {
 
         if (!isUsable()) return Optional.empty();
         if (!forceCreate && isModPresent()) return Optional.empty();
@@ -155,20 +216,11 @@ public class V4ManifestCreator implements ManifestCreator {
         boolean githubFound = modPojo.getContact().getSources().toLowerCase().startsWith("http://github.com/")
                 || modPojo.getContact().getSources().toLowerCase().startsWith("https://github.com/");
 
-        boolean curseforgeFound;
-        Optional<CurseProject> optionalCurseProject;
+        Optional<CurseProject> optionalCurseProject = CurseAPI.project(curseforgeId);
+        boolean curseforgeFound = optionalCurseProject.isPresent();
 
-        try {
-            optionalCurseProject = CurseAPI.project(curseforgeId);
-            curseforgeFound = optionalCurseProject.isPresent();
-        } catch (CurseException ex) {
-            ex.printStackTrace();
-            return Optional.empty();
-        }
-
-        boolean modrinthFound = modrinthQuery.modExists();
         Optional<ModrinthV1ModPojo> optionalModrinthV1ModPojo = modrinthQuery.getMod();
-        if (modrinthFound && optionalModrinthV1ModPojo.isEmpty()) return Optional.empty(); //Should never happen.
+        boolean modrinthFound = optionalModrinthV1ModPojo.isPresent();
 
         //Set publisher
         if (githubFound) {
@@ -287,55 +339,47 @@ public class V4ManifestCreator implements ManifestCreator {
         manifestV4MainPojo.setVersions(modVersionList.toArray(new ManifestV4MainPojo.Version[0]));
 
 
-        try {
-            return Optional.of(
-                    yamlMapper.writeValueAsString(manifestV4MainPojo)
-                            /*
-                            Make it so that Tilde is never in quotes, but all other strings are.
-                            Example format:
+        return Optional.of(
+                yamlMapper.writeValueAsString(manifestV4MainPojo)
+                        /*
+                        Make it so that Tilde is never in quotes, but all other strings are.
+                        Example format:
 
-                            fieldA: "some value"
-                            fieldB: ~
-                            */
-                            .replace(": \"~\"", ": ~")
+                        fieldA: "some value"
+                        fieldB: ~
+                        */
+                        .replace(": \"~\"", ": ~")
 
-                            //Fix issue of chats.others being represented incorrectly as null.
-                            .replace("others: null", "others: ~")
-            );
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
-        return Optional.empty();
+                        //Fix issue of chats.others being represented incorrectly as null.
+                        .replace("others: null", "others: ~")
+        );
+
     }
 
 
     @Override
-    public boolean isModPresent() {
+    public boolean isModPresent() throws Exception {
         if (!isUsable()) return false;
 
-        try {
-            ManifestRepository mainManifestRepo = repoManager.getRepo(0);
+        ManifestRepository mainManifestRepo = repoManager.getRepo(0);
 
-            LookupTable mainRepoTable = mainManifestRepo.getOrDownloadLookupTable();
-            List<LookupTableEntry> lookupTableEntries = mainRepoTable.getOrDownloadEntries();
+        LookupTable mainRepoTable = mainManifestRepo.getOrDownloadLookupTable();
+        List<LookupTableEntry> lookupTableEntries = mainRepoTable.getOrDownloadEntries();
 
-            for (LookupTableEntry entry : lookupTableEntries) {
-                if (entry.getId().equals(modPojo.getId())) {
-                    for (ModPackage modPackage : entry.getOrDownloadPackages()) {
-                        for (ModManifest modManifest : modPackage.getOrDownloadManifests(List.of(mainManifestRepo))) {
-                            for (ModAuthor modAuthor : modManifest.getAuthors()) {
-                                for (String pojoAuthorName : modPojo.getAuthors()) {
-                                    if (modAuthor.getName().equals(pojoAuthorName)) return true;
-                                }
+        for (LookupTableEntry entry : lookupTableEntries) {
+            if (entry.getId().equals(modPojo.getId())) {
+                for (ModPackage modPackage : entry.getOrDownloadPackages()) {
+                    for (ModManifest modManifest : modPackage.getOrDownloadManifests(List.of(mainManifestRepo))) {
+                        for (ModAuthor modAuthor : modManifest.getAuthors()) {
+                            for (String pojoAuthorName : modPojo.getAuthors()) {
+                                if (modAuthor.getName().equals(pojoAuthorName)) return true;
                             }
                         }
                     }
                 }
             }
-
-        } catch (Exception ex) {
-            ex.printStackTrace();
         }
+
         return false;
     }
 

@@ -102,14 +102,19 @@ public class CreateCommand implements Command {
 
         if (optionalToken.isPresent()) {
             token = optionalToken.get();
-            if (!tokenManager.validateToken(token)) {
-                System.out.println(
-                        colorize(
-                                "Your GitHub token is invalid! Please ensure that it has the " +
-                                        "\"public_repo\" scope as well.",
-                                Attribute.RED_TEXT()
-                        )
-                );
+            try {
+                if (!tokenManager.validateToken(token)) {
+                    System.out.println(
+                            colorize(
+                                    "Your GitHub token is invalid! Please ensure that it has the " +
+                                            "\"public_repo\" scope as well.",
+                                    Attribute.RED_TEXT()
+                            )
+                    );
+                    return;
+                }
+            } catch (IOException ex) {
+                ex.printStackTrace();
                 return;
             }
         } else {
@@ -185,20 +190,33 @@ public class CreateCommand implements Command {
             );
         }
 
-        if (manifestCreator.isModPresent() && !forceRecreate) {
-            System.out.println(
-                    colorize(
-                            "Thanks for wanting to contribute, but the manifest for this mod already exists," +
-                                    " or is currently being PR-ed by someone else!\n" +
-                                    "Cancelling operation...",
-                            Attribute.YELLOW_TEXT()
-                    )
-            );
+        try {
+            if (manifestCreator.isModPresent() && !forceRecreate) {
+                System.out.println(
+                        colorize(
+                                "Thanks for wanting to contribute, but the manifest for this mod already exists," +
+                                        " or is currently being PR-ed by someone else!\n" +
+                                        "Cancelling operation...",
+                                Attribute.YELLOW_TEXT()
+                        )
+                );
+                return;
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
             return;
         }
 
-        Optional<String> optionalMainManifest = manifestCreator.createMainYaml(forceRecreate);
-        Optional<String> optionalLookupTable = manifestCreator.createLookupTable(forceRecreate);
+        Optional<String> optionalMainManifest;
+        Optional<String> optionalLookupTable;
+
+        try {
+            optionalMainManifest = manifestCreator.createMainYaml(forceRecreate);
+            optionalLookupTable = manifestCreator.createLookupTable(forceRecreate);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return;
+        }
 
         if (optionalMainManifest.isEmpty() || optionalLookupTable.isEmpty()) {
             System.out.println(
@@ -217,6 +235,12 @@ public class CreateCommand implements Command {
                 );
                 mainYmlStream.write(optionalMainManifest.get().getBytes(StandardCharsets.UTF_8));
                 mainYmlStream.close();
+
+                FileOutputStream lookupTableStream = new FileOutputStream(
+                        outputFolder.getAbsolutePath() + File.separator + "lookup-table.yaml"
+                );
+                lookupTableStream.write(optionalLookupTable.get().getBytes(StandardCharsets.UTF_8));
+                lookupTableStream.close();
             }
 
         } catch (IOException ex) {
