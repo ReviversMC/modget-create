@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @SuppressWarnings("unused")
-public class FabricModPojo {
+public class FabricV1ModPojo {
 
     private String[] authors;
     private String name;
@@ -14,9 +14,9 @@ public class FabricModPojo {
     private String id;
     private String version;
 
-    private Contact contact;
+    private Contact contact = new Contact();
 
-    public FabricModPojo() {
+    public FabricV1ModPojo() {
 
     }
 
