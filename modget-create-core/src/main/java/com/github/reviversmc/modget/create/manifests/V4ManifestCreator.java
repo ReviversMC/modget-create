@@ -415,4 +415,12 @@ public class V4ManifestCreator implements ManifestCreator {
     public boolean isUsable() {
         return isUsable;
     }
+
+    @Override
+    public Optional<String> getModId() {
+        if (isUsable) {
+            return Optional.of(modPojo.getName());
+        }
+        return Optional.empty();
+    }
 }

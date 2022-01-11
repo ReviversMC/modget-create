@@ -59,4 +59,11 @@ public interface ManifestCreator {
      * @return True if it is a initialization was successful, false otherwise.
      */
     boolean isUsable();
+
+    /**
+     * Gets the mod id, if valid.
+     *
+     * @return The mod id, wrapped in an {@link Optional} if valid.
+     */
+    Optional<String> getModId();
 }
