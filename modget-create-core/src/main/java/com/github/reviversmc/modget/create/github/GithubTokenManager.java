@@ -30,7 +30,7 @@ public class GithubTokenManager implements TokenManager {
     }
 
     @Override
-    public boolean setToken(String token) {
+    public boolean setToken(String token) throws IOException {
         if (validateToken(token)) {
             this.githubToken = token;
             return true;
@@ -39,20 +39,16 @@ public class GithubTokenManager implements TokenManager {
     }
 
     @Override
-    public boolean validateToken(String token) {
+    public boolean validateToken(String token) throws IOException {
         //We unfortunately cannot check the scope of the token with the api.
         Properties authProperties = new Properties();
         authProperties.setProperty("oauth", token);
 
-        try {
-            GitHub githubAPI =  GitHubBuilder.fromProperties(authProperties)
-                    .withConnector(gitHubConnector).build();
 
-            return githubAPI.isCredentialValid() && githubAPI.getRateLimit().getRemaining() > 0;
+        GitHub githubAPI = GitHubBuilder.fromProperties(authProperties)
+                .withConnector(gitHubConnector).build();
 
-        } catch (IOException ex) {
-            ex.printStackTrace();
-            return false;
-        }
+        return githubAPI.isCredentialValid() && githubAPI.getRateLimit().getRemaining() > 0;
+
     }
 }
