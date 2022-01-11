@@ -38,7 +38,9 @@ public class ArgObtainer {
         List<String> values = new ArrayList<>();
         for (Map.Entry<String, List<String>> attemptObtain : args.entrySet()) {
             if (toObtain.contains(attemptObtain.getKey())) {
-                values.forEach(value -> {if (!value.equals("")) values.add(value);});
+                for (String value : attemptObtain.getValue()) {
+                    if (!value.equals("")) values.add(value);
+                }
             }
         }
         return values;
