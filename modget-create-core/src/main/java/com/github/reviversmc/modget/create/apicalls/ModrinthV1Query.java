@@ -33,30 +33,33 @@ public class ModrinthV1Query implements ModrinthQuery {
     }
 
     @Override
-    public Optional<ModrinthV1ModPojo> getMod() throws IOException {
+    public Optional<ModrinthV1ModPojo> getMod() {
         if (modExists()) {
             Request request = new Request.Builder()
                     .url("https://api.modrinth.com/api/v1/mod/" + projectId)
                     .build();
 
+            try {
+                Response response = okHttpClient.newCall(request).execute();
+                ResponseBody responseBody = response.body();
 
-            Response response = okHttpClient.newCall(request).execute();
-            ResponseBody responseBody = response.body();
+                if (responseBody != null) {
+                    String responseBodyString = responseBody.string();
+                    response.close();
+                    return Optional.of(
+                            jsonMapper.readValue(responseBodyString, ModrinthV1ModPojo.class)
+                    );
+                }
 
-            if (responseBody != null) {
-                String responseBodyString = responseBody.string();
-                response.close();
-                return Optional.of(
-                        jsonMapper.readValue(responseBodyString, ModrinthV1ModPojo.class)
-                );
+            } catch (IOException ex) {
+                ex.printStackTrace();
             }
-
         }
         return Optional.empty();
     }
 
     @Override
-    public ModrinthV1TeamMemberPojo[] getTeamMembers() throws IOException {
+    public ModrinthV1TeamMemberPojo[] getTeamMembers() {
         if (modExists()) {
 
             Optional<ModrinthV1ModPojo> optionalModPojo = getMod();
@@ -67,23 +70,26 @@ public class ModrinthV1Query implements ModrinthQuery {
                             optionalModPojo.get().getTeam() + "/members")
                     .build();
 
+            try {
+                Response response = okHttpClient.newCall(request).execute();
+                ResponseBody responseBody = response.body();
 
-            Response response = okHttpClient.newCall(request).execute();
-            ResponseBody responseBody = response.body();
+                if (responseBody != null) {
+                    String responseBodyString = responseBody.string();
+                    response.close();
+                    return jsonMapper.readValue(responseBodyString, ModrinthV1TeamMemberPojo[].class);
 
-            if (responseBody != null) {
-                String responseBodyString = responseBody.string();
-                response.close();
-                return jsonMapper.readValue(responseBodyString, ModrinthV1TeamMemberPojo[].class);
+                }
 
+            } catch (IOException ex) {
+                ex.printStackTrace();
             }
-
         }
         return new ModrinthV1TeamMemberPojo[0];
     }
 
     @Override
-    public Optional<ModrinthV1UserPojo> getOwner() throws IOException {
+    public Optional<ModrinthV1UserPojo> getOwner() {
         if (modExists()) {
             ModrinthV1TeamMemberPojo[] teamMemberPojos = getTeamMembers();
             if (teamMemberPojos.length == 0) return Optional.empty();
@@ -95,42 +101,48 @@ public class ModrinthV1Query implements ModrinthQuery {
                         .url("https://api.modrinth.com/api/v1/user/" + teamMemberPojo.getUserId())
                         .build();
 
+                try {
+                    Response response = okHttpClient.newCall(request).execute();
+                    ResponseBody responseBody = response.body();
 
-                Response response = okHttpClient.newCall(request).execute();
-                ResponseBody responseBody = response.body();
+                    if (responseBody != null) {
+                        String responseBodyString = responseBody.string();
+                        response.close();
+                        return Optional.of(
+                                jsonMapper.readValue(responseBodyString, ModrinthV1UserPojo.class)
+                        );
+                    }
 
-                if (responseBody != null) {
-                    String responseBodyString = responseBody.string();
-                    response.close();
-                    return Optional.of(
-                            jsonMapper.readValue(responseBodyString, ModrinthV1UserPojo.class)
-                    );
+                } catch (IOException ex) {
+                    ex.printStackTrace();
                 }
-
             }
         }
         return Optional.empty();
     }
 
     @Override
-    public boolean modExists() throws IOException {
+    public boolean modExists() {
         Request request = new Request.Builder()
                 .url("https://api.modrinth.com/api/v1/mod/" + projectId)
                 .build();
 
+        try {
+            Response response = okHttpClient.newCall(request).execute();
+            ResponseBody responseBody = response.body();
 
-        Response response = okHttpClient.newCall(request).execute();
-        ResponseBody responseBody = response.body();
-
-        if (responseBody != null) {
-            if (!responseBody.string().equals("")) {
-                response.close();
-                return true;
+            if (responseBody != null) {
+                if (!responseBody.string().equals("")) {
+                    response.close();
+                    return true;
+                }
             }
+
+            response.close();
+
+        } catch (IOException ex) {
+            ex.printStackTrace();
         }
-
-        response.close();
-
         return false;
     }
 }

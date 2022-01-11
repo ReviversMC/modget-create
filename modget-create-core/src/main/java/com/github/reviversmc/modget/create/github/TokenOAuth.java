@@ -12,11 +12,8 @@ public interface TokenOAuth {
      *
      * @param oAuthVerifyCodePojo Can be obtained from {@link TokenOAuth#getOAuthVerifyCode()}
      * @return True if successful, false otherwise. The token can then be obtained by {@link TokenManager#getToken()}
-     * @throws InterruptedException If the thread is interrupted when sleeping.
-     * @throws IOException          If the api calls to GitHub fail.
      */
-    boolean createOAuthAccessToken(OAuthVerifyCodePojo oAuthVerifyCodePojo)
-            throws InterruptedException, IOException;
+    boolean createOAuthAccessToken(OAuthVerifyCodePojo oAuthVerifyCodePojo) throws InterruptedException, IOException;
 
     /**
      * Gets the verification code, required by {@link TokenOAuth#createOAuthAccessToken(OAuthVerifyCodePojo)}
@@ -24,5 +21,5 @@ public interface TokenOAuth {
      *
      * @return The response by GitHub in POJO.
      */
-    OAuthVerifyCodePojo getOAuthVerifyCode() throws IOException;
+    OAuthVerifyCodePojo getOAuthVerifyCode();
 }

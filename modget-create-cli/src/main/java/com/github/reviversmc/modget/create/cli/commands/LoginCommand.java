@@ -1,6 +1,5 @@
 package com.github.reviversmc.modget.create.cli.commands;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -46,26 +45,21 @@ public class LoginCommand implements Command {
             return;
         }
 
-        try {
-            if (tokenManager.setToken(optionalToken.get())) {
-                System.out.println(
-                        colorize(
-                                "Login success!",
-                                Attribute.GREEN_TEXT()
-                        )
-                );
-                return;
-            }
-        } catch (IOException ex) {
-            ex.printStackTrace();
+        if (tokenManager.setToken(optionalToken.get())) {
+            System.out.println(
+                    colorize(
+                            "Login success!",
+                            Attribute.GREEN_TEXT()
+                    )
+            );
+        } else {
+            System.out.println(
+                    colorize(
+                            "Login failed! Perhaps you had incorrect scopes or an invalid token?",
+                            Attribute.RED_TEXT()
+                    )
+            );
         }
-        System.out.println(
-                colorize(
-                        "Login failed! Perhaps you had bad internet or an invalid token?",
-                        Attribute.RED_TEXT()
-                )
-        );
-
 
     }
 
