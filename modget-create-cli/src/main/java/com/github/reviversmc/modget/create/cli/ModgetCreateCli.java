@@ -41,7 +41,8 @@ public class ModgetCreateCli {
 
         System.out.println(
                 colorize(
-                        "modget-create successfully started!",
+                        "modget-create successfully started!\n" +
+                                "Don't know how to use modget-create? Enter the command \"?\".",
                         Attribute.GREEN_TEXT()
                 )
         );
