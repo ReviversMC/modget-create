@@ -36,10 +36,12 @@ public class LoginCommand implements Command {
 
         Optional<String> optionalToken = ArgObtainer.obtainFirst(args, List.of("-t", "--token"));
 
-        if (optionalToken.isEmpty()) { //Should never happen.
+        if (optionalToken.isEmpty()) {
             System.out.println(
                     colorize(
-                            "An unexpected error occurred!",
+                            "You need to provide a token, in order to log in with a token!\n" +
+                                    "Meant to use guided log in (oauth) instead? " +
+                                    "Don't pass the \"-t/--token\" argument.",
                             Attribute.RED_TEXT()
                     )
             );

@@ -1,11 +1,17 @@
 package com.github.reviversmc.modget.create.cli.commands;
 
 import com.diogonunes.jcolor.Attribute;
+import com.github.reviversmc.modget.create.apicalls.ModrinthQuery;
+import com.github.reviversmc.modget.create.apicalls.ModrinthQueryFactory;
 import com.github.reviversmc.modget.create.data.ModStatus;
+import com.github.reviversmc.modget.create.data.ModrinthV1ModPojo;
 import com.github.reviversmc.modget.create.github.TokenManager;
 import com.github.reviversmc.modget.create.github.TokenOAuthGuider;
 import com.github.reviversmc.modget.create.manifests.ManifestCreator;
 import com.github.reviversmc.modget.create.manifests.ManifestCreatorFactory;
+import com.therandomlabs.curseapi.CurseAPI;
+import com.therandomlabs.curseapi.CurseException;
+import com.therandomlabs.curseapi.project.CurseProject;
 
 import javax.inject.Inject;
 import java.io.*;
@@ -19,16 +25,19 @@ import static com.diogonunes.jcolor.Ansi.colorize;
 public class CreateCommand implements Command {
 
     private final ManifestCreatorFactory manifestCreatorFactory;
+    private final ModrinthQueryFactory modrinthQueryFactory;
     private final TokenManager tokenManager;
     private final TokenOAuthGuider tokenOAuthGuider;
 
     @Inject
     public CreateCommand(
             ManifestCreatorFactory manifestCreatorFactory,
+            ModrinthQueryFactory modrinthQueryFactory,
             TokenManager tokenManager,
             TokenOAuthGuider tokenOAuthGuider
     ) {
         this.manifestCreatorFactory = manifestCreatorFactory;
+        this.modrinthQueryFactory = modrinthQueryFactory;
         this.tokenManager = tokenManager;
         this.tokenOAuthGuider = tokenOAuthGuider;
     }
@@ -37,28 +46,145 @@ public class CreateCommand implements Command {
     public void onCommand(Map<String, List<String>> args) {
 
         //All of these will definitely have a value, as they are mandatory values.
-        Optional<String> optionalCurseforgeId = ArgObtainer.obtainFirst(args, List.of("-cf", "--curseforge"));
-        Optional<String> optionalModrinthId = ArgObtainer.obtainFirst(args, List.of("-mr", "--modrinth"));
         Optional<String> optionalJarPath = ArgObtainer.obtainFirst(args, List.of("-j", "-jar", "--jar"));
         Optional<String> optionalStatus = ArgObtainer.obtainFirst(args, List.of("-s", "--status"));
         List<String> modVersions = ArgObtainer.obtainAll(args, List.of("-v", "-ver", "--version"));
         Optional<String> optionalWiki = ArgObtainer.obtainFirst(args, List.of("-w", "--wiki"));
 
-        if (optionalCurseforgeId.isEmpty() ||
-                optionalModrinthId.isEmpty() ||
-                optionalJarPath.isEmpty() ||
-                optionalStatus.isEmpty() ||
-                modVersions.isEmpty() ||
-                optionalWiki.isEmpty()
-        ) { //Should never happen.
-
+        if (optionalJarPath.isEmpty()) {
             System.out.println(
                     colorize(
-                            "An unexpected error occurred!",
+                            "You need to provide the path to the mod! (argument -j/-jar/--jar)",
                             Attribute.RED_TEXT()
                     )
             );
             return;
+        }
+        if (optionalStatus.isEmpty()) {
+            System.out.println(
+                    colorize(
+                            "You need to provide the mod status! (argument -s/--status) " +
+                                    "Please specify \"ABANDONED\", \"ACTIVE\", \"EOL\", or \"UNKNOWN\".",
+                            Attribute.RED_TEXT()
+                    )
+            );
+            return;
+        }
+        if (modVersions.isEmpty()) {
+            System.out.println(
+                    colorize(
+                            "You need to provide all versions of the mod! (argument -v/-ver/--version)",
+                            Attribute.RED_TEXT()
+                    )
+            );
+            return;
+        }
+        if (optionalWiki.isEmpty()) {
+            System.out.println(
+                    colorize(
+                            "You need to provide the wiki page for this mod! (argument -w/--wiki)",
+                            Attribute.RED_TEXT()
+                    )
+            );
+            return;
+        }
+
+        Optional<String> optionalCurseforgeId = ArgObtainer.obtainFirst(args, List.of("-cf", "--curseforge"));
+        Optional<String> optionalModrinthId = ArgObtainer.obtainFirst(args, List.of("-mr", "--modrinth"));
+
+        if (optionalCurseforgeId.isEmpty()) {
+            System.out.println(
+                    colorize("WARNING: You did not specify a Curseforge id for this mod!" +
+                                    "If this mod does not have a Curseforge page, " +
+                                    "this warning can be safely ignored.",
+                            Attribute.YELLOW_TEXT()
+                    )
+            );
+        } else {
+            try {
+                int curseId = Integer.parseInt(optionalCurseforgeId.get());
+                Optional<CurseProject> optionalCurseProject = CurseAPI.project(curseId);
+
+                if (optionalCurseProject.isEmpty()) {
+                    System.out.println(
+                            colorize(
+                                    "The Curseforge id provided does not link to " +
+                                            "any Curseforge page!",
+                                    Attribute.RED_TEXT()
+                            )
+                    );
+                    return;
+                }
+
+                System.out.println(
+                        colorize(
+                                "Mod identified on Curseforge as " + optionalCurseProject.get().name(),
+                                Attribute.GREEN_TEXT()
+                        )
+                );
+
+            } catch (CurseException ex) {
+                ex.printStackTrace();
+                System.out.println(
+                        colorize(
+                                "An error occurred " +
+                                        "when trying to obtain this project's Curseforge site!",
+                                Attribute.RED_TEXT()
+                        )
+                );
+                return;
+            } catch (NumberFormatException ex) {
+                System.out.println(
+                        colorize(
+                                "The Curseforge id should only consist of numbers!",
+                                Attribute.RED_TEXT()
+                        )
+                );
+                return;
+            }
+        }
+
+        if (optionalModrinthId.isEmpty()) {
+            System.out.println(
+                    colorize("WARNING: You did not specify a Modrinth id for this mod!" +
+                                    "If this mod does not have a Modrinth page, " +
+                                    "this warning can be safely ignored.",
+                            Attribute.YELLOW_TEXT()
+                    )
+            );
+        } else {
+            ModrinthQuery modrinthQuery = modrinthQueryFactory.create(optionalModrinthId.get());
+
+            try {
+                Optional<ModrinthV1ModPojo> optionalModrinthModPojo = modrinthQuery.getMod();
+
+                if (optionalModrinthModPojo.isEmpty()) {
+                    System.out.println(
+                            colorize(
+                                    "The provided modrinth id does not link to any Modrinth site!",
+                                    Attribute.RED_TEXT()
+                            )
+                    );
+                    return;
+                }
+
+                System.out.println(
+                        colorize(
+                                "Mod identified on Modrinth as " +
+                                        optionalModrinthModPojo.get().getTitle(),
+                                Attribute.GREEN_TEXT()
+                        )
+                );
+
+            } catch (IOException ex) {
+                System.out.println(
+                        colorize(
+                                "An error occurred when attempting to communicate with Modrinth!",
+                                Attribute.RED_TEXT()
+                        )
+                );
+                return;
+            }
         }
 
         ModStatus modStatus;
@@ -162,9 +288,9 @@ public class CreateCommand implements Command {
                 updateAlternatives,
                 modStatus,
                 token, //Null value is fine.
-                optionalCurseforgeId.get(),
+                optionalCurseforgeId.orElse(""),
                 optionalJarPath.get(),
-                optionalModrinthId.get(),
+                optionalModrinthId.orElse(""),
                 optionalWiki.get()
         );
 
@@ -255,12 +381,20 @@ public class CreateCommand implements Command {
 
     @Override
     public String getDescription() {
-        return null;
+        return "This command creates all the files necessary for a new manifest.\n" +
+                "Parameter definitions:\n" +
+                "-cf <id>, --curseforge <id>: The Curseforge id of the mod your wish to create a manifest for. " +
+                "Pass without value if Not Applicable.\n" +
+                "-j <path/to/mod>, -jar <path/to/mod>, --jar <path/to/mod>: The path to the mod you wish" +
+                "to create a manifest for. You can drag and drop the mod onto your terminal.\n" +
+                "-mr <id/slug>, --modrinth <id/slug>: The Modrinth id/slug of the mod " +
+                "you wish to create a manifest for. Pass without value if Not Applicable.";
     }
 
     @Override
     public List<String> getOptionalParameters() {
-        return List.of("-force",
+        return List.of(
+                "-force",
                 "--force-recreate",
                 "-o",
                 "--output",
