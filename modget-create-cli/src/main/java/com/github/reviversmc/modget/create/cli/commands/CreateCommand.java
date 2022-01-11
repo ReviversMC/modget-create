@@ -358,6 +358,18 @@ public class CreateCommand implements Command {
             if (optionalUserSpecifiedOutputFolder.isPresent()) {
                 String modId = manifestCreator.getModId().orElseThrow();
                 File modOutputFolder = new File(userSpecifiedOutputFolder + File.separator + modId);
+                if (!modOutputFolder.mkdirs() && !modOutputFolder.exists()) {
+                    System.out.println(
+                            colorize(
+                                    "Tried, and failed, to create a directory at "
+                                            + modOutputFolder.getAbsolutePath() + "! " +
+                                            "Please create this folder manually.",
+                                    Attribute.RED_TEXT()
+                            )
+                    );
+                    return;
+                }
+
                 FileOutputStream mainYmlStream = new FileOutputStream(
                         modOutputFolder.getAbsolutePath() + File.separator + "main.yml"
                 );
@@ -369,6 +381,14 @@ public class CreateCommand implements Command {
                 );
                 lookupTableStream.write(optionalLookupTable.get().getBytes(StandardCharsets.UTF_8));
                 lookupTableStream.close();
+
+                System.out.println(
+                        colorize(
+                                "Creation success! The files can be found at " +
+                                        modOutputFolder.getAbsolutePath() + ".",
+                                Attribute.GREEN_TEXT()
+                        )
+                );
             } else {
                 //TODO(The automatic PR function is not yet complete! Please specify an output folder for the time being.)
             }
