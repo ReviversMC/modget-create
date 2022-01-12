@@ -196,6 +196,22 @@ public class V4ManifestCreator implements ManifestCreator {
         modEntry.setAlternativeNames(alternateNames.toArray(new String[0]));
 
 
+        List<String> tagList = new ArrayList<>();
+        optionalCurseProject.ifPresent(curseProject -> curseProject.categories().forEach(
+                category -> tagList.add(category.name())
+        ));
+
+        optionalModrinthV1ModPojo.ifPresent(modrinthV1ModPojo -> {
+                    for (String category : modrinthV1ModPojo.getCategories()) {
+                        if (!tagList.contains(category))
+                            tagList.add(category);
+                    }
+                }
+        );
+
+        modEntry.setTags(tagList.toArray(new String[0]));
+
+
         List<ManifestV4LookupTablePojo> editedLookupTablePojoList = new ArrayList<>();
 
 
@@ -219,7 +235,7 @@ public class V4ManifestCreator implements ManifestCreator {
                         fieldB: ~
                         */
                         .replace(": \"~\"", ": ~")
-                    .replace(": []", ": ~")
+                        .replace(": []", ": ~")
         );
 
     }
