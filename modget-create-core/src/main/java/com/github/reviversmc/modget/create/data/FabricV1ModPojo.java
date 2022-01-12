@@ -15,6 +15,7 @@ public class FabricV1ModPojo {
     private String version;
 
     private Contact contact = new Contact();
+    private EntryPoint entryPoints = new EntryPoint();
 
     public FabricV1ModPojo() {
 
@@ -68,10 +69,18 @@ public class FabricV1ModPojo {
         this.contact = contact;
     }
 
+    public EntryPoint getEntryPoints() {
+        return entryPoints;
+    }
+
+    public void setEntryPoints(EntryPoint entryPoints) {
+        this.entryPoints = entryPoints;
+    }
+
     /*
-    This is a huge dumping group for all values, as there can be so many dynamic values.
-    Should never actually be used to get values!
-    */
+        This is a huge dumping group for all values, as there can be so many dynamic values.
+        Should never actually be used to get values!
+        */
     @JsonAnySetter
     public void addJson(String key, Object value) {
         //Purposefully empty.
@@ -135,6 +144,66 @@ public class FabricV1ModPojo {
 
         public Map<String, Object> getOthers() {
             return others;
+        }
+    }
+
+    /**
+     * If the mod is in Java, all variables will be an array of {@link String}.
+     * Else, it will be an array of {@link EntryPointObject}
+     */
+    public static class EntryPoint {
+        private Object[] client;
+        private Object[] main;
+        private Object[] server;
+
+        public Object[] getClient() {
+            return client;
+        }
+
+        public void setClient(Object[] client) {
+            this.client = client;
+        }
+
+        public Object[] getMain() {
+            return main;
+        }
+
+        public void setMain(Object[] main) {
+            this.main = main;
+        }
+
+        public Object[] getServer() {
+            return server;
+        }
+
+        public void setServer(Object[] server) {
+            this.server = server;
+        }
+
+        public static class EntryPointObject {
+            private String adapter;
+            private String value;
+
+            public String getAdapter() {
+                return adapter;
+            }
+
+            public void setAdapter(String adapter) {
+                this.adapter = adapter;
+            }
+
+            public String getValue() {
+                return value;
+            }
+
+            public void setValue(String value) {
+                this.value = value;
+            }
+
+            @JsonAnySetter
+            public void addJson(String key, Object value) {
+
+            }
         }
     }
 }
