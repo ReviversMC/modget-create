@@ -1,14 +1,10 @@
 package com.github.reviversmc.modget.create.cli;
 
-import java.io.IOException;
-
 import com.diogonunes.jcolor.Attribute;
 import com.github.reviversmc.modget.create.cli.commands.CommandManager;
-import com.github.reviversmc.modget.create.cli.commands.DaggerCommandManagerComponent;
 import org.jline.reader.LineReader;
 import org.jline.reader.LineReaderBuilder;
 import org.jline.terminal.Terminal;
-import org.jline.terminal.TerminalBuilder;
 
 import static com.diogonunes.jcolor.Ansi.colorize;
 
@@ -23,21 +19,9 @@ public class ModgetCreateCli {
                 )
         );
 
-        CommandManager commandManager = DaggerCommandManagerComponent.create().getCommandManager();
-
-        Terminal terminal;
-
-        try {
-            terminal = TerminalBuilder.terminal();
-        } catch (IOException ex) {
-            ex.printStackTrace();
-            return;
-        }
-
-        LineReader lineReader = LineReaderBuilder.builder()
-                .appName("Modget Create CLI")
-                .terminal(terminal)
-                .build();
+        CLIComponent cliComponent = DaggerCLIComponent.create();
+        CommandManager commandManager = cliComponent.getCommandManager();
+        LineReader lineReader = cliComponent.getLineReader();
 
         System.out.println(
                 colorize(

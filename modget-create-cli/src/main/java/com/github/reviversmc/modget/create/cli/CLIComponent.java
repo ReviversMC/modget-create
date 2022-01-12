@@ -1,13 +1,15 @@
-package com.github.reviversmc.modget.create.cli.commands;
+package com.github.reviversmc.modget.create.cli;
 
 import javax.inject.Singleton;
 
-import com.github.reviversmc.modget.create.cli.CLIMiscModule;
+import com.github.reviversmc.modget.create.cli.commands.CommandManager;
+import com.github.reviversmc.modget.create.cli.commands.CommandModule;
 import com.github.reviversmc.modget.create.dependencies.DependencyModule;
 import com.github.reviversmc.modget.create.github.TokenManagerModule;
 
 import com.github.reviversmc.modget.create.manifests.ManifestModule;
 import dagger.Component;
+import org.jline.reader.LineReader;
 
 @Component(modules = {
         CLIMiscModule.class,
@@ -17,6 +19,7 @@ import dagger.Component;
         TokenManagerModule.class
 })
 @Singleton
-public interface CommandManagerComponent {
+public interface CLIComponent {
     CommandManager getCommandManager();
+    LineReader getLineReader();
 }
