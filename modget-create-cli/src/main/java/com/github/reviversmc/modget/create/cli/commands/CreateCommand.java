@@ -12,6 +12,7 @@ import com.github.reviversmc.modget.create.manifests.ManifestCreatorFactory;
 import com.therandomlabs.curseapi.CurseAPI;
 import com.therandomlabs.curseapi.CurseException;
 import com.therandomlabs.curseapi.project.CurseProject;
+import org.jline.reader.LineReader;
 
 import javax.inject.Inject;
 import java.io.*;
@@ -24,6 +25,7 @@ import static com.diogonunes.jcolor.Ansi.colorize;
 
 public class CreateCommand implements Command {
 
+    private final LineReader lineReader;
     private final ManifestCreatorFactory manifestCreatorFactory;
     private final ModrinthQueryFactory modrinthQueryFactory;
     private final TokenManager tokenManager;
@@ -31,11 +33,13 @@ public class CreateCommand implements Command {
 
     @Inject
     public CreateCommand(
+            LineReader lineReader,
             ManifestCreatorFactory manifestCreatorFactory,
             ModrinthQueryFactory modrinthQueryFactory,
             TokenManager tokenManager,
             TokenOAuthGuider tokenOAuthGuider
     ) {
+        this.lineReader = lineReader;
         this.manifestCreatorFactory = manifestCreatorFactory;
         this.modrinthQueryFactory = modrinthQueryFactory;
         this.tokenManager = tokenManager;
@@ -337,6 +341,9 @@ public class CreateCommand implements Command {
             return;
         }
 
+        Optional<String> optionalNoConfirmString = ArgObtainer.obtainFirst(args, List.of("--no-confirm"));
+        boolean noConfirm = optionalNoConfirmString.isPresent();
+
         Optional<String> optionalMainManifest;
         Optional<String> optionalLookupTable;
 
@@ -362,6 +369,25 @@ public class CreateCommand implements Command {
             if (optionalUserSpecifiedOutputFolder.isPresent()) {
                 String modId = manifestCreator.getModId().orElseThrow();
                 File modOutputFolder = new File(userSpecifiedOutputFolder + File.separator + modId);
+
+                if (!noConfirm) {
+                    System.out.println(
+                            colorize(
+                                    "MGC will output 3 files at " + modOutputFolder + ".",
+                                    Attribute.GREEN_TEXT()
+                            )
+                    );
+                    while (true) {
+                        String input = lineReader.readLine("Proceed? [y/n]: ");
+                        if (input.equalsIgnoreCase("y")) break;
+                        else if (input.equalsIgnoreCase("n")) {
+                            System.out.println(
+                                    colorize("Operation cancelled.", Attribute.YELLOW_TEXT())
+                            );
+                        }
+                    }
+                }
+
                 if (!modOutputFolder.mkdirs() && !modOutputFolder.exists()) {
                     System.out.println(
                             colorize(
@@ -426,6 +452,7 @@ public class CreateCommand implements Command {
                 "to create a manifest for. You can drag and drop the mod onto your terminal.\n" +
                 "-mr, --modrinth <id/slug>:     The Modrinth id/slug of the mod " +
                 "you wish to create a manifest for. Pass without value if Not Applicable.\n" +
+                "--no-confirm:                  Use the create command without confirmation prompts.\n" +
                 "-o, --output <path/to/folder>: The output folder where this command should create the " +
                 "appropriate files. A subfolder will be created for the mod. " +
                 "Do NOT use if you want automatic PRs\n" +
@@ -446,6 +473,7 @@ public class CreateCommand implements Command {
         return List.of(
                 "-force",
                 "--force-recreate",
+                "--no-confirm",
                 "-o",
                 "--output",
                 "-t",
