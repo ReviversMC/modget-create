@@ -30,7 +30,7 @@ jobs:
     - name: ShadowJar modget-create-cli
       run: ./gradlew :modget-create-cli:shadowJar
     - name: Upload modget-create-cli
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: modget-create-cli-dev
         path: modget-create-cli/build/libs/*.jar
